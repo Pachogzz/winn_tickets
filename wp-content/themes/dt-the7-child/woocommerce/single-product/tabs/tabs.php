@@ -28,6 +28,48 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 $product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 
+$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
+$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
+$prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
+
+$tabs = $boletosTabs + 1;
+
+$noBoletos = get_post_meta( get_the_ID(), 'boletos_total', true ) / $boletosTabs;
+
+
+?>
+
+	<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
+		<ul class="tabs wc-tabs" role="tablist">
+		
+			<?php for ($i = 1; $i < $tabs; $i++) : ?>
+				<li class="<?php echo esc_attr( $i ); ?>_tab" id="tab-title-<?php echo esc_attr( $i ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $i ); ?>">
+					<a href="#tab-<?php echo esc_attr( $i ); ?>">
+						<?php echo $prefijoTabs . " " . $i; ?>
+					</a>
+				</li>
+			<?php endfor; ?>
+		</ul>
+		<?php for ($i = 1; $i < $tabs; $i++) : ?>
+			<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $i ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $i ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $i ); ?>">
+				<ul class="list-boletos">
+					<?php for($n = 1; $n < $noBoletos; $n++) : ?>
+						<li>
+							<a href="#">
+								<?php echo $prefijoBoletos .  " " . $n; ?>
+							</a>
+						</li>
+					<?php endfor; ?>
+				</ul>
+			</div>
+		<?php endfor; ?>
+
+		<?php do_action( 'woocommerce_product_after_tabs' ); ?>
+
+	</div>
+
+<?php
+
 if ( ! empty( $product_tabs ) ) : ?>
 
 	<div class="woocommerce-tabs wc-tabs-wrapper">

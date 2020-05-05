@@ -26,7 +26,6 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 ?>
 
 <?php do_action( 'presscore_before_post' ); ?>
-
 <article <?php wc_product_class( 'post visible', $product ); ?>>
 
 	<?php

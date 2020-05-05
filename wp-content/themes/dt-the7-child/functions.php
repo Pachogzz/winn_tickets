@@ -47,18 +47,21 @@ function boletos_product_panels(){
 		));
  
 		woocommerce_wp_text_input( array(
-			'id'                => 'boletos_plugin_version',
-			'value'             => get_post_meta( get_the_ID(), 'boletos_plugin_version', true ),
-			'label'             => 'Plugin version',
-			'description'       => 'Description when desc_tip param is not true'
+			'id'                => 'prefijo_tabs',
+			'value'             => get_post_meta( get_the_ID(), 'prefijo_tabs', true ),
+			'label'             => 'Prefijo de la Tabs'
 		));
-	 
-		woocommerce_wp_textarea_input( array(
-			'id'          => 'boletos_changelog',
-			'value'       => get_post_meta( get_the_ID(), 'boletos_changelog', true ),
-			'label'       => 'Changelog',
-			'desc_tip'    => true,
-			'description' => 'Prove the plugin changelog here',
+
+		woocommerce_wp_text_input( array(
+			'id'                => 'boletos_total',
+			'value'             => get_post_meta( get_the_ID(), 'boletos_total', true ),
+			'label'             => 'Total de boletos'
+		));
+
+		woocommerce_wp_text_input( array(
+			'id'                => 'prefijo_boletos',
+			'value'             => get_post_meta( get_the_ID(), 'prefijo_boletos', true ),
+			'label'             => 'Prefijo de Boletos'
 		));
 	 
 		woocommerce_wp_select( array(
@@ -74,16 +77,29 @@ function boletos_product_panels(){
 }
 
 /**
- * Save
+ * Save the custom fields.
  */
-add_action( 'woocommerce_process_product_meta', 'boletos_save_fields', 10, 2 );
-function boletos_save_fields($id, $post){
- 
- 	if (!empty($_POST['boletos_tab'])) {
- 		add_post_meta( $id, 'boletos_tab', $_POST['boletos_tab'] );
- 	}
- 
+function save_boletos($post_id){
+
+	if (!empty($_POST['boletos_tabs'])) {
+		update_post_meta( $post_id, 'boletos_tabs', $_POST['boletos_tabs']);
+	}
+
+	if(!empty($_POST['prefijo_tabs'])){
+		update_post_meta( $post_id, 'prefijo_tabs', $_POST['prefijo_tabs']);
+	}
+	
+	if(!empty($_POST['boletos_total'])){
+		update_post_meta( $post_id, 'boletos_total', $_POST['boletos_total']);
+	}
+
+	if(!empty($_POST['prefijo_boletos'])){
+		update_post_meta( $post_id, 'prefijo_boletos', $_POST['prefijo_boletos']);
+	}
+
 }
+add_action( 'woocommerce_process_product_meta_simple', 'save_boletos'  );
+add_action( 'woocommerce_process_product_meta_variable', 'save_boletos'  );
 
 
 /**
