@@ -151,9 +151,8 @@ class PublicScriptManager extends ScriptManager {
     /**
      * @return array
      *
-     * @since 3.7.0 added new filter - "mphb_custom_front_nonces".
-     * @since 3.7.0 added new filter - "mphb_public_room_type_data".
-     * @since 3.7.0 added new filter - "mphb_public_booking_rules_data".
+     * @since 3.7 added new filters: "mphb_custom_front_nonces", "mphb_public_room_type_data" and "mphb_public_booking_rules_data".
+     * @since 3.8 added new filter - "mphb_public_js_data".
      */
 	public function getLocalizeData(){
 		$jsDateFormat = MPHB()->settings()->dateTime()->getDateTransferFormat();
@@ -300,6 +299,8 @@ class PublicScriptManager extends ScriptManager {
         $bookingRules = apply_filters('mphb_public_booking_rules_data', $bookingRules);
 
         $data['_data']['rules'] = $bookingRules;
+
+        $data = apply_filters('mphb_public_js_data', $data);
 
 		return $data;
 	}

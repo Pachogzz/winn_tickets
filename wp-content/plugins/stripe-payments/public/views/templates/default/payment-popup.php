@@ -168,7 +168,7 @@
 						<?php echo isset( $a['fatal_error'] ) ? esc_html( $a['fatal_error'] ) : ''; ?>
 					</div>
 					<form method="post" id="payment-form" class="pure-form pure-form-stacked" <?php echo isset( $a['fatal_error'] ) ? 'style="display: none;"' : ''; ?>>
-						<?php if ( $a['data']['amount_variable'] ) { ?>
+						<?php if ( $a['data']['amount_variable'] && ! $this->item->get_meta( 'asp_product_hide_amount_input' ) ) { ?>
 						<div class="pure-u-1">
 							<label for="amount"><?php esc_html_e( 'Enter amount', 'stripe-payments' ); ?></label>
 							<input class="pure-input-1" id="amount" name="amount" inputmode="decimal" value="<?php echo esc_attr( ! empty( $a['data']['item_price'] ) ? ASP_Utils::formatted_price( $a['data']['item_price'], false, true ) : '' ); ?>" required>
@@ -334,20 +334,23 @@
 										$img = '';
 										if ( isset( $pm['img'] ) ) {
 											$img = sprintf(
-												' <img loading="lazy" alt="%s" height="%s" width="%s" src="%s">',
+												' <img loading="lazy" title="%1$s" alt="%1$s" height="%2$d" width="%3$d" src="%4$s">',
 												$pm['title'],
 												isset( $pm['img_height'] ) ? $pm['img_height'] : 32,
 												isset( $pm['img_width'] ) ? $pm['img_width'] : 32,
 												$pm['img']
 											);
 										}
-										$out .= sprintf( '<div class="pure-u-1 pure-u-md-1-3"><label class="pure-radio"><input name="pm" class="pm-select-btn" type="radio"%s value="%s" data-pm-id="%s">%s%s %s</label></div>', empty( $out ) ? ' checked' : '', $pm['id'], $pm['id'], isset( $pm['before_title'] ) ? $pm['before_title'] : '', ! empty( $img ) ? $img : '', $pm['title'] );
+										$out .= sprintf( '<div class="pure-u-1 pure-u-md-1-3"><label class="pure-radio"><input name="pm" class="pm-select-btn" type="radio"%s value="%s" data-pm-id="%s">%s%s %s</label></div>', empty( $out ) ? ' checked' : '', $pm['id'], $pm['id'], isset( $pm['before_title'] ) ? $pm['before_title'] : '', ! empty( $img ) ? $img : '', isset( $pm['hide_title'] ) ? '' : $pm['title'] );
 									}
 									echo $out; //phpcs:ignore
 									?>
 								</fieldset>
 							</div>
-							<?php } ?>
+								<?php
+							}
+							do_action( 'asp_ng_pp_output_before_address', $a['data'] );
+							?>
 							<div class="pure-g">
 								<fieldset id="name-email-cont" style="width: 100%;">
 									<div class="pure-u-1 pure-u-md-11-24">
@@ -404,14 +407,21 @@
 												<label for="city"><?php esc_html_e( 'City', 'stripe-payments' ); ?></label>
 												<input class="pure-input-1" type="text" id="city" name="city" required>
 											</div>
-											<div class="pure-u-1 pure-u-md-14-24 baddr-toggle" style="position: relative;">
+											<div class="pure-u-1 pure-u-md-<?php echo $a['hide_state_field'] ? '14' : '10'; ?>-24 baddr-toggle" style="position: relative;">
 												<label for="country"><?php esc_html_e( 'Country', 'stripe-payments' ); ?></label>
 												<select class="pure-input-1" name="country" id="country" required>
 													<?php echo ASP_Utils::get_countries_opts($a['data']['customer_default_country']); //phpcs:ignore ?>
 												</select>
 											</div>
+											<?php if ( ! $a['hide_state_field'] ) { ?>
 											<div class="pure-u-md-1-24 baddr-hide"></div>
-											<div class="pure-u-1 pure-u-md-9-24 baddr-toggle">
+											<div class="pure-u-1 pure-u-md-6-24 baddr-toggle" style="position: relative;">
+												<label for="state"><?php esc_html_e( 'State', 'stripe-payments' ); ?></label>
+												<input class="pure-input-1" type="text" id="state" name="state">
+											</div>
+											<?php } ?>
+											<div class="pure-u-md-1-24 baddr-hide"></div>
+											<div class="pure-u-1 pure-u-md-<?php echo $a['hide_state_field'] ? '9' : '6'; ?>-24 baddr-toggle">
 												<label for="postcode"><?php esc_html_e( 'Postcode', 'stripe-payments' ); ?></label>
 												<input class="pure-u-1" type="text" name="postcode" id="postcode">
 											</div>
@@ -448,6 +458,12 @@
 													<?php echo ASP_Utils::get_countries_opts($a['data']['customer_default_country']); //phpcs:ignore ?>
 												</select>
 											</div>
+											<?php if ( ! $a['hide_state_field'] ) { ?>
+											<div class="pure-u-1">
+												<label for="shipping_state"><?php esc_html_e( 'State', 'stripe-payments' ); ?></label>
+												<input class="pure-u-1" type="text" name="shipping_state" id="shipping_state">
+											</div>
+											<?php } ?>
 											<div class="pure-u-1">
 												<label for="shipping_postcode"><?php esc_html_e( 'Postcode', 'stripe-payments' ); ?></label>
 												<input class="pure-u-1" type="text" name="shipping_postcode" id="shipping_postcode">
@@ -491,15 +507,14 @@
 							</div>
 						</div>
 						<input type="hidden" id="payment-intent" name="payment_intent" value="">
+						<input type="hidden" id="btn-uniq-id" name="btn_uniq_id" value="<?php echo ! empty( $a['btn_uniq_id'] ) ? esc_attr( $a['btn_uniq_id'] ) : ''; ?>">
 						<input type="hidden" id="product-id" name="product_id" value="<?php echo esc_attr( $a['prod_id'] ); ?>">
 						<input type="hidden" name="process_ipn" value="1">
 						<input type="hidden" name="is_live" value="<?php echo $a['is_live'] ? '1' : '0'; ?>">
 						<?php if ( $a['data']['url'] ) { ?>
 						<input type="hidden" name="item_url" value="<?php echo esc_attr( $a['data']['url'] ); ?>">
 						<?php } ?>
-						<?php if ( ! empty( $a['thankyou_page'] ) ) { ?>
-						<input type="hidden" value="<?php echo esc_attr( base64_encode( $a['thankyou_page'] ) ); ?>" name="thankyou_page_url">
-						<?php } ?>
+						<input type="hidden" value="<?php echo ! empty( $a['thankyou_page'] ) ? esc_attr( base64_encode( $a['thankyou_page'] ) ) : ''; ?>" name="thankyou_page_url" id="thankyou_page_url">
 						<?php if ( ! empty( $a['data']['create_token'] ) ) { ?>
 						<input type="hidden" value="1" name="create_token">
 						<input type="hidden" value="" id="sub_id" name="sub_id">

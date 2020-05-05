@@ -1,4 +1,4 @@
-/*! elementor - v2.9.6 - 12-03-2020 */
+/*! elementor - v2.9.8 - 21-04-2020 */
 @charset "UTF-8";
 .elementor-control-unit-1 {
   width: 27px; }
@@ -282,6 +282,7 @@ body {
   width: 100%; }
 
 .elementor-button {
+  font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
   font-weight: 500;
   text-transform: uppercase;
   outline: none;
@@ -2396,8 +2397,15 @@ a.elementor-responsive-switcher {
       -ms-flex-positive: 1;
           flex-grow: 1; }
 
+.elementor-control-type-slider.elementor-control-dynamic input {
+  -webkit-border-radius: 3px 0 0 3px;
+          border-radius: 3px 0 0 3px; }
+
+.elementor-control-type-slider.elementor-control-type-slider--multiple .elementor-control-input-wrapper {
+  display: block; }
+
 .elementor-control-type-slider--multiple {
-  margin-bottom: 14px; }
+  padding-bottom: 40px; }
   .elementor-control-type-slider--multiple .elementor-slider {
     margin-top: 12px;
     width: 98%; }
@@ -2430,7 +2438,12 @@ a.elementor-responsive-switcher {
     -webkit-box-shadow: -2px 2px 3px 0px rgba(0, 0, 0, 0.1);
             box-shadow: -2px 2px 3px 0px rgba(0, 0, 0, 0.1); }
 
-.elementor-control-type-slider:not(.elementor-control-type-slider--multiple) .elementor-control-input-wrapper {
+.elementor-control-type-slider .elementor-control-dynamic-switcher {
+  border-left-width: 0;
+  -webkit-border-radius: 0 3px 3px 0;
+          border-radius: 0 3px 3px 0; }
+
+.elementor-control-type-slider .elementor-control-input-wrapper {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2439,6 +2452,9 @@ a.elementor-responsive-switcher {
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center; }
+
+.elementor-control-type-slider .elementor-dynamic-cover {
+  margin-top: 10px; }
 
 .elementor-slider {
   -webkit-box-flex: 1;
@@ -2727,6 +2743,9 @@ a.elementor-responsive-switcher {
   -webkit-border-radius: 3px 0 0 3px;
           border-radius: 3px 0 0 3px; }
 
+.elementor-control-type-url .elementor-control-field {
+  position: relative; }
+
 .elementor-control-type-url:not(.elementor-control-dynamic) .elementor-control-url-more, .elementor-control-type-url.elementor-control-dynamic-value .elementor-control-url-more {
   -webkit-border-radius: 0 3px 3px 0;
           border-radius: 0 3px 3px 0; }
@@ -2835,10 +2854,12 @@ a.elementor-responsive-switcher {
 .elementor-control-type-url .elementor-control-url-autocomplete-spinner {
   display: none;
   position: absolute;
-  width: 12px;
-  height: 12px;
-  top: 7px;
-  left: 44px; }
+  top: 5px;
+  right: 0px;
+  width: 10px;
+  height: 10px;
+  font-size: 10px;
+  color: #D4D4D4; }
 
 .elementor-control-type-url .elementor-control-url__custom-attributes {
   margin-top: 10px; }

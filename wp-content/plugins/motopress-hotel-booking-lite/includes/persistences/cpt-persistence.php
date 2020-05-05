@@ -13,7 +13,8 @@ class CPTPersistence {
 	/**
 	 * @param array $atts
      *
-     * @since 3.7.0 added new filter - "{postType}_persistence_get_posts_atts".
+     * @since 3.7 added new filter - "{postType}_persistence_get_posts_atts".
+     * @since 3.8 parameter "suppress_filters" not forced to the value FALSE anymore.
 	 */
 	public function getPosts( $atts = array() ){
 
@@ -24,7 +25,6 @@ class CPTPersistence {
 		$atts = $this->modifyQueryAtts( $atts );
 
 		$atts['ignore_sticky_posts'] = true;
-		$atts['suppress_filters']	 = false;
 
 		$atts = apply_filters('mphb_persistence_get_posts_atts', $atts, $this->postType);
         $atts = apply_filters("{$this->postType}_persistence_get_posts_atts", $atts);
@@ -226,12 +226,13 @@ class CPTPersistence {
     protected function getDefaultQueryAtts($customAtts = array())
     {
         $atts = array_merge(array(
-            'posts_per_page' => -1,
-            'post_status'	 => array(
+            'posts_per_page'   => -1,
+            'post_status'      => array(
                 'publish'
             ),
-            'post_type'		 => $this->postType,
-            'fields'		 => 'ids'
+            'post_type'        => $this->postType,
+            'fields'           => 'ids',
+            'suppress_filters' => false
         ), $customAtts);
 
 		return apply_filters("{$this->postType}_persistence_default_query_atts", $atts);

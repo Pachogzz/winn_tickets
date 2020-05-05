@@ -1,4 +1,75 @@
-﻿v 5.2.2 – 24 March 2020
+﻿v 5.3.5 – 28 April 2020
+- Added: An option to accept one booking for all occurrences of a certain event (pro)
+- Added: Internal cache solution to cache frequently used data
+- Added: Style for taxonomies
+- Disabled: Yearly view by default in full calendar (lite)
+- Updated: French translation (Thanks to Bernard)
+- Used: A new formula for booking price calculation (pro)
+- Fixed: Price calculation after applying percentage coupons (pro)
+- Fixed: Event time form
+- Fixed: Yearly repeat
+- Fixed: Loading local time in skins
+- Fixed: Closing tag in grid skin
+- Fixed: Normal mode of search bar
+- Fixed: An issue in table creation when InnoDB module is not installed on MySQL server
+- Fixed: Display Normal label and Cancellation reason in full calendar
+- Fixed: some PHP notices
+
+v 5.3.0 – 21 April 2020
+- Added: Minimum option for coupons (pro)
+- Added: An option to display event time in grid skin
+- Added: Grid and tile skins to the full calendar skins
+- Added: Dark mode styles for wizards popup
+- Updated: The whole textual interface of the plugin for English
+- Fixed: Locked the "Enter Key" on search bar Ajax mode
+- Fixed: Wrong local-time date on shortcodes
+- Fixed: Display image content on modal popup
+- Fixed: A conflict with Seopress plugin
+- Fixed: A Conflict with Neve theme
+- Fixed: Related evens module
+- Fixed: Search bar
+- Fixed: Some minor issues
+
+v 5.2.7 – 14 April 2020
+- Fixed: An issue with full calendar
+
+v 5.2.6 – 14 April 2020
+- Added: Start and end dates in RSS feeds
+- Increased: Default date generation limit for advanced events
+- Fixed: Showing correct error on Facebook importer (pro)
+- Fixed: Loading gateway options when booking module is disabled (pro)
+- Fixed: Transaction ID in PayPal Gateway (pro)
+- Fixed: Google Maps Geo code on Safari browser (pro)
+- Fixed: The new events badge in backend
+- Fixed: Divi theme builder and the Bloom plugin (tinymc conflicts)
+- Fixed: Tile view responsive size on mobile and tablet
+- Fixed: Close button on modal popup view responsive size on mobile and tablet
+- Fixed: Hover style on the grid view skin minimal style
+
+v 5.2.5 – 8 April 2020
+- Added: Normal Label to all skins
+- Added: Cancellation reason to all skins
+- Added: Cancellation reason to single and popup single page
+- Added: Delete event feature on Google Calendar Export and Google Calendar import
+- Added: URL field for locations
+- Fixed: Carousel and slider skins
+- Fixed: User booking limit
+- Fixed: Weekly view
+- Fixed: Search when working with expired events
+- Fixed: Some minor issues
+
+v 5.2.3 – 31 March 2020
+- Added: SEO Schema section to specify event status due to COVID-19 (New properties for virtual, postponed, and canceled events — <a href="https://bit.ly/2ygWgF4" target="_blank">read more here</a>)
+- Added: A new currency (Israeli Shekel)
+- Changed: The next and back button positions on the booking form (pro)
+- Fixed: MEC sender name and email
+- Fixed: MEC Archive page
+- Fixed: An issue in update client of MEC
+- Fixed: Advanced repeat
+- Fixed: Internal cronjob of MEC (pro)
+- Fixed: The "New Event" notification
+
+v 5.2.2 – 24 March 2020
 - Added: An option in tile skin to load events in list view
 - Fixed: A display issue in tile skin
 - Fixed: An issue regarding showing red borders in booking modal for required fields (pro)

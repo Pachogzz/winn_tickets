@@ -3,7 +3,7 @@ Contributors: MotoPress
 Donate link: https://motopress.com/
 Tags: hotel booking, reservation, hotel, booking engine, booking, booking calendar, booking system, calendar, appointment, availability calendar, reservations, online booking, travel, airbnb, booking.com, ical
 Requires at least: 4.6
-Tested up to: 5.3
+Tested up to: 5.4
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -14,7 +14,7 @@ The #1 Hotel Booking and Vacation Rental Plugin for WordPress. Online payments, 
 Hotel Booking plugin by MotoPress is the ultimate WordPress property rental system with a real lodging business in mind.
 
 * [Plugin Demo](https://hbdemo.getmotopress.com/) with the Dashboard access.
-* [Video Guides](https://www.youtube.com/playlist?list=PLbDImkyrISyKQccIsVDp98UXLIc1Yc3mn)
+* [20+ Video Guides](https://www.youtube.com/playlist?list=PLbDImkyrISyKQccIsVDp98UXLIc1Yc3mn)
 * [Docs](https://motopress.com/files/motopress-hotel-booking-plugin-documentation.pdf) - step-by-step guides to set up and manage the plugin.
 
 Using this WP hotel booking reservation plugin, you can create a simple vacation rental listing as well as a powerful rental property booking website with all sorts of online and offline payments, automatic inventory control, taxes and fees info, flexible pricing rates, custom policies and more.
@@ -75,11 +75,12 @@ Get a better sense of how the plugin works:
 [Hotel Booking plugin addons](https://motopress.com/products/category/hotel-booking-addons/?utm_source=wp-org-hb-lite-page&utm_medium=text-link&utm_content=hotel-booking-addons) are available for adding custom functionality to your rental website:
 
 * [WooCommerce Payments](https://motopress.com/products/hotel-booking-woocommerce-payments/?utm_source=wp-org-hb-lite-page&utm_medium=text-link&utm_content=woocommerce-payment-addon) addon - extend the number of payment gateways.
-* [Payment Request](https://motopress.com/products/hotel-booking-payment-request/?utm_source=wp-org-hb-lite-page&utm_medium=text-link&utm_content=hotel-booking-payment-request-addon) addon - email the payment reminder link to your guests.
+* [Payment Request](https://motopress.com/products/hotel-booking-payment-request/?utm_source=wp-org-hb-lite-page&utm_medium=text-link&utm_content=hotel-booking-payment-request-addon) addon - automate your workflow of requesting and collecting rental payments from your clients.
 * [Reviews and Rating](https://motopress.com/products/hotel-booking-reviews/?utm_source=wp-org-hb-lite-page&utm_medium=text-link&utm_content=hotel-booking-reviews-rating-addon) addon - allow guests to rate and review your property.
-* [Elementor Integration](https://wordpress.org/plugins/mphb-elementor/) addon - helps speed up the work with your hotel website.
+* [Elementor Integration](https://wordpress.org/plugins/mphb-elementor/) addon - helps speed up the work with your Elementor hotel website.
 * [Divi Integration](https://wordpress.org/plugins/mphb-divi/) addon - integrates Divi theme with the MotoPress Hotel Booking plugin to modify content and styles visually via Divi builder.
 * [Hotel Booking Notifier](https://motopress.com/products/hotel-booking-notifier?utm_source=wp_org_hb_page&utm_medium=hotel-booking-notifier) addon - create automated event-driven emails before and after arrival/departure.
+* [Hotel Booking Checkout Fields](https://motopress.com/products/hotel-booking-checkout-fields/) addon - edit the form at the checkout by customizing current fields or adding new ones.
 
 = Pro Features: =
 
@@ -88,6 +89,7 @@ Get a better sense of how the plugin works:
 * More built-in payment gateways (2Checkout, Braintree, Stripe, Beanstream/Bambora).
 * **Automatic bookings synchronization with OTAs** (exchange calendars via iCal) like Booking.com, Airbnb, TripAdvisor or HomeAway. This will help you rent out accommodations on different platforms simultaneously and avoid overbooking.
 * Adding reservations from the backend.
+* The ability to edit original booking details, including departure/arrival dates, booked services, rates, and accommodations (add, remove, or replace originally booked properties).
 * Different property prices based on a number of guests and nights.
 
 Have a look at all Pro [plugin features](https://motopress.com/motopress-wordpress-hotel-booking-pro-vs-lite/?utm_source=wp-org&utm_medium=pro-features&utm_campaign=hotel-booking-lite&utm_content=here).
@@ -136,6 +138,12 @@ Hotel Booking Lite plugin is distributed under the terms of the GNU GPL.
 
 
 == Changelog ==
+
+= 3.8.1, Apr 24 2020 =
+* Added support for Hotel Booking Styles addon.
+
+= 3.8.0, Mar 31 2020 =
+* Added the ability to edit existing bookings: you can now update check-in and check-out dates, rates, services, etc., as well as add, replace, or remove accommodations in the original bookings.
 
 = 3.7.6, Mar 6 2020 =
 * Fixed the issue with incorrect hooks priority set in 3.7.2.

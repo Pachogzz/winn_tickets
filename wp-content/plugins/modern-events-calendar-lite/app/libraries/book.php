@@ -100,7 +100,7 @@ class MEC_book extends MEC_base
                 elseif($fee['type'] == 'amount') $fee_amount += ($total_tickets_count*$fee['amount']);
                 elseif($fee['type'] == 'amount_per_booking') $fee_amount += $fee['amount'];
 
-                $details[] = array('amount'=>$fee_amount, 'description'=>__($fee['title'], 'modern-events-calendar-lite'), 'type'=>'fee');
+                $details[] = array('amount'=>$fee_amount, 'description'=>__($fee['title'], 'modern-events-calendar-lite'), 'type'=>'fee', 'fee_type'=>$fee['type'], 'fee_amount'=>$fee['amount']);
 
                 $total_fee_amount += $fee_amount;
             }
@@ -235,7 +235,16 @@ class MEC_book extends MEC_base
 
         $location_id = get_post_meta($event_id, 'mec_location_id', true);
         if(!empty($location_id)) update_post_meta($book_id, 'mec_booking_location', $location_id);
-        if(isset($values['mec_attendees'])) update_post_meta($book_id, 'mec_attendees', $values['mec_attendees']);
+        if(isset($values['mec_attendees']))
+        {
+            foreach($values['mec_attendees'] as $k => $mec_attendee)
+            {
+                if(!is_numeric($k)) continue;
+                $values['mec_attendees'][$k]['buyerip'] = $this->main->get_client_ip();
+            }
+
+            update_post_meta($book_id, 'mec_attendees', $values['mec_attendees']);
+        }
 
         $price = isset($transaction['price']) ? $transaction['price'] : (isset($transaction['total']) ? $transaction['total'] : 0);
         update_post_meta($book_id, 'mec_price', $price);
@@ -541,9 +550,10 @@ class MEC_book extends MEC_base
      * @author Webnus <info@webnus.biz>
      * @param string $coupon
      * @param int $event_id
+     * @param array $transaction
      * @return int
      */
-    public function coupon_check_validity($coupon, $event_id)
+    public function coupon_check_validity($coupon, $event_id, $transaction)
     {
         $term = get_term_by('name', $coupon, 'mec_coupon');
         $coupon_id = isset($term->term_id) ? $term->term_id : 0;
@@ -575,6 +585,19 @@ class MEC_book extends MEC_base
             }
         }
 
+        // Ticket Limit
+        if($status === 1)
+        {
+            $ticket_limit = get_term_meta($coupon_id, 'ticket_limit', true);
+            if(!trim($ticket_limit)) $ticket_limit = 1;
+
+            $tickets = isset($transaction['tickets']) ? $transaction['tickets'] : array();
+            if($ticket_limit > count($tickets))
+            {
+                $status = -4;
+            }
+        }
+
         return $status;
     }
 
@@ -591,7 +614,7 @@ class MEC_book extends MEC_base
         $event_id = isset($transaction['event_id']) ? $transaction['event_id'] : NULL;
 
         // Verify validity of coupon
-        if($this->coupon_check_validity($coupon, $event_id) != 1) return 0;
+        if($this->coupon_check_validity($coupon, $event_id, $transaction) != 1) return 0;
 
         $total = $transaction['total'];
         $discount = $this->coupon_get_discount($coupon, $total);
@@ -599,15 +622,27 @@ class MEC_book extends MEC_base
         $after_discount = $total - $discount;
 
         $transaction['price_details']['total'] = $after_discount;
-        $transaction['price_details']['details'][] = array('amount'=>$discount, 'description'=>__('Discount', 'modern-events-calendar-lite'), 'type'=>'discount');
 
+        $price_details = $transaction['price_details']['details'];
+        foreach($price_details as $i => $price_detail)
+        {
+            if(isset($price_detail['type']) and $price_detail['type'] == 'discount' and isset($price_detail['coupon'])) unset($price_details[$i]);
+        }
+
+        $price_details[] = array('amount'=>$discount, 'description'=>__('Discount', 'modern-events-calendar-lite'), 'type'=>'discount', 'coupon'=>$coupon);
+
+        $transaction['price_details']['details'] = $price_details;
         $transaction['discount'] = $discount;
         $transaction['price'] = $after_discount;
         $transaction['coupon'] = $coupon;
 
+        // Re-caclculate
+        $transaction = $this->recalculate($transaction);
+
+        // Update Transaction
         $this->update_transaction($transaction_id, $transaction);
 
-        return $discount;
+        return (isset($transaction['discount']) ? $transaction['discount'] : $discount);
     }
 
     /**
@@ -643,9 +678,68 @@ class MEC_book extends MEC_base
     public function coupon_get_id($coupon)
     {
         $term = get_term_by('name', $coupon, 'mec_coupon');
-        $coupon_id = isset($term->term_id) ? $term->term_id : 0;
+        return isset($term->term_id) ? $term->term_id : 0;
+    }
 
-        return $coupon_id;
+    public function recalculate($transaction)
+    {
+        $price_details = $transaction['price_details']['details'];
+        $total_tickets_count = count($transaction['tickets']);
+
+        $total_fee_amount = 0;
+        $taxable = 0;
+        $total_discount = 0;
+        $fees_to_apply = array();
+        $discounts_to_apply = array();
+
+        foreach($price_details as $i => $item)
+        {
+            $type = isset($item['type']) ? $item['type'] : '';
+            $amount = isset($item['amount']) ? $item['amount'] : 0;
+
+            if($type == 'fee') $fees_to_apply[] = $item;
+            elseif($type == 'discount') $discounts_to_apply[] = $item;
+            else $taxable += $amount;
+
+            // Remove Fee and Discount Items
+            if(in_array($type, array('fee', 'discount'))) unset($price_details[$i]);
+        }
+
+        $total = $taxable;
+
+        // Apply Discounts
+        foreach($discounts_to_apply as $discount_item)
+        {
+            $discount = $this->coupon_get_discount($discount_item['coupon'], $taxable);
+            $taxable = max(0, ($taxable - $discount));
+            $total_discount += $discount;
+
+            $price_details[] = array('amount'=>$discount, 'description'=>__('Discount', 'modern-events-calendar-lite'), 'type'=>'discount', 'coupon'=>$discount_item['coupon']);
+        }
+
+        // Apply Fees
+        foreach($fees_to_apply as $fee_item)
+        {
+            $fee_amount = 0;
+
+            if($fee_item['fee_type'] == 'percent') $fee_amount += ($taxable*$fee_item['fee_amount'])/100;
+            elseif($fee_item['fee_type'] == 'amount') $fee_amount += ($total_tickets_count*$fee_item['fee_amount']);
+            elseif($fee_item['fee_type'] == 'amount_per_booking') $fee_amount += $fee_item['fee_amount'];
+
+            $total_fee_amount += $fee_amount;
+            $price_details[] = array('amount'=>$fee_amount, 'description'=>__($fee_item['description'], 'modern-events-calendar-lite'), 'type'=>'fee', 'fee_type'=>$fee_item['fee_type'], 'fee_amount'=>$fee_item['fee_amount']);
+        }
+
+        $total += $total_fee_amount;
+        $payable = ($taxable + $total_fee_amount);
+
+        $transaction['price_details']['total'] = $payable;
+        $transaction['price_details']['details'] = $price_details;
+        $transaction['discount'] = $total_discount;
+        $transaction['price'] = $payable;
+        $transaction['total'] = $total;
+
+        return $transaction;
     }
 
     /**

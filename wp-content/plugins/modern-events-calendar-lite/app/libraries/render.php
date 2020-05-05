@@ -254,6 +254,20 @@ class MEC_render extends MEC_base
     }
 
     /**
+     * Do the tile skin and returns its output
+     * @author Webnus <info@webnus.biz>
+     * @param array $atts
+     * @return string
+     */
+    public function vtile($atts = array())
+    {
+        $atts = apply_filters('mec_vtile_atts', $atts);
+        $skin = 'tile';
+
+        return $this->skin($skin, $atts);
+    }
+
+    /**
      * Do the custom skin and returns its output
      * @author Webnus <info@webnus.biz>
      * @param array $atts
@@ -528,7 +542,7 @@ class MEC_render extends MEC_base
         if(trim($thumbnail) == '' and trim($medium) != '') $thumbnail = preg_replace("/height=\"[0-9]*\"/", 'height="150"', preg_replace("/width=\"[0-9]*\"/", 'width="150"', $medium));
         elseif(trim($thumbnail) == '' and trim($large) != '') $thumbnail = preg_replace("/height=\"[0-9]*\"/", 'height="150"', preg_replace("/width=\"[0-9]*\"/", 'width="150"', $large));
         
-        $data->thumbnails = array(
+        $dataThumbnails = apply_filters('mec-render-data-thumbnails', [
             'thumbnail'=>$thumbnail,
             'thumblist'=>$thumblist,
             'gridsquare'=>$gridsquare,
@@ -537,10 +551,11 @@ class MEC_render extends MEC_base
             'large'=>$large,
             'full'=>$full,
             'tileview'=>$tileview
-        );
-        
+        ], $post_id);
+        $data->thumbnails = $dataThumbnails;
+
         // Featured image URLs
-        $data->featured_image = array(
+        $dataFeaturedImage = apply_filters('mec-render-data-featured-image', array(
             'thumbnail'=>esc_url(get_the_post_thumbnail_url($post_id, 'thumbnail')),
             'thumblist'=>esc_url(get_the_post_thumbnail_url($post_id, 'thumblist' )),
             'gridsquare'=>esc_url(get_the_post_thumbnail_url($post_id, 'gridsquare' )),
@@ -549,7 +564,8 @@ class MEC_render extends MEC_base
             'large'=>esc_url(get_the_post_thumbnail_url($post_id, 'large')),
             'full'=>esc_url(get_the_post_thumbnail_url($post_id, 'full')),
             'tileview'=>esc_url(get_the_post_thumbnail_url($post_id, 'tileview'))
-        );
+        ), $post_id);
+        $data->featured_image = $dataFeaturedImage;
 
         $taxonomies = array('mec_label', 'mec_organizer', 'mec_location', 'mec_category', 'post_tag');
         if(isset($this->settings['speakers_status']) and $this->settings['speakers_status']) $taxonomies[] = 'mec_speaker';
@@ -562,9 +578,10 @@ class MEC_render extends MEC_base
 
             if($term->taxonomy == 'mec_label') $data->labels[$term->term_id] = array('id'=>$term->term_id, 'name'=>$term->name, 'color'=>get_metadata('term', $term->term_id, 'color', true), 'style'=>get_metadata('term', $term->term_id, 'style', true));
             elseif($term->taxonomy == 'mec_organizer') $data->organizers[$term->term_id] = array('id'=>$term->term_id, 'name'=>$term->name, 'tel'=>get_metadata('term', $term->term_id, 'tel', true), 'email'=>get_metadata('term', $term->term_id, 'email', true), 'url'=>get_metadata('term', $term->term_id, 'url', true), 'thumbnail'=>get_metadata('term', $term->term_id, 'thumbnail', true));
-            elseif($term->taxonomy == 'mec_location') {
-                $locations = array('id'=>$term->term_id, 'name'=>$term->name, 'address'=>get_metadata('term', $term->term_id, 'address', true), 'latitude'=>get_metadata('term', $term->term_id, 'latitude', true), 'longitude'=>get_metadata('term', $term->term_id, 'longitude', true), 'thumbnail'=>get_metadata('term', $term->term_id, 'thumbnail', true));
-                $data->locations[$term->term_id] = apply_filters( 'mec_map_load_location_terms', $locations, $term );
+            elseif($term->taxonomy == 'mec_location')
+            {
+                $locations = array('id'=>$term->term_id, 'name'=>$term->name, 'address'=>get_metadata('term', $term->term_id, 'address', true), 'latitude'=>get_metadata('term', $term->term_id, 'latitude', true), 'longitude'=>get_metadata('term', $term->term_id, 'longitude', true), 'url'=>get_metadata('term', $term->term_id, 'url', true), 'thumbnail'=>get_metadata('term', $term->term_id, 'thumbnail', true));
+                $data->locations[$term->term_id] = apply_filters('mec_map_load_location_terms', $locations, $term);
             }
             elseif($term->taxonomy == 'mec_category') $data->categories[$term->term_id] = array('id'=>$term->term_id, 'name'=>$term->name);
             elseif($term->taxonomy == 'post_tag') $data->tags[$term->term_id] = array('id'=>$term->term_id, 'name'=>$term->name);
@@ -810,6 +827,9 @@ class MEC_render extends MEC_base
             }
             elseif($repeat_type == 'yearly')
             {
+                // Start from Event Start Date
+                if(strtotime($start_date['date']) > strtotime($original_start_date)) $original_start_date = $start_date['date'];
+
                 $event_days = explode(',', trim($event->mec->day, ', '));
                 $event_months = explode(',', trim($event->mec->month, ', '));
                 
@@ -949,7 +969,6 @@ class MEC_render extends MEC_base
     
         // Set last month for include current month results
         $month = date('m', strtotime('first day of last month', strtotime($event_info['start']['date'])));
-        $current_day = date("d", strtotime($event_info['start']['date']));
 
         if($month == '12') $year = $year - 1;
     
@@ -995,7 +1014,7 @@ class MEC_render extends MEC_base
                 $index = intval($d[1]) ? (intval($d[1]) - 1) : 4;
     
                 // Generate date
-                $date = "{$year}-{$month}-{$current_day}";
+                $date = date('Y-m-t', strtotime("{$year}-{$month}-01"));
     
                 // Generate start date for example "first Sun of next month"
                 $start = date('Y-m-d', strtotime("{$levels[$index]} {$d[0]} of next month", strtotime($date)));

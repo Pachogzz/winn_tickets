@@ -250,6 +250,32 @@ class Booking {
 		return $key;
 	}
 
+    /**
+     * Note: you need to call updateTotal() manually when all changes are done.
+     *
+     * @param \DateTime $checkInDate
+     * @param \DateTime $checkOutDate
+     *
+     * @since 3.8
+     */
+    public function setDates($checkInDate, $checkOutDate)
+    {
+        $this->checkInDate = $checkInDate;
+        $this->checkOutDate = $checkOutDate;
+    }
+
+    /**
+     * Note: you need to call updateTotal() manually when all changes are done.
+     *
+     * @param \MPHB\Entities\ReservedRoom[] $rooms
+     *
+     * @since 3.8
+     */
+    public function setRooms($rooms)
+    {
+        $this->reservedRooms = $rooms;
+    }
+
 	public function updateTotal(){
 		$this->totalPrice = $this->calcPrice();
 	}
@@ -407,6 +433,9 @@ class Booking {
 		wp_insert_comment( $commentdata );
 	}
 
+    /**
+     * @todo Remove this method. Check the history: while its still here?
+     */
 	public function getRoomLink(){
 		return $this->room->getLink();
 	}
@@ -472,6 +501,24 @@ class Booking {
 	public function getReservedRooms(){
 		return $this->reservedRooms;
 	}
+
+    /**
+     * @return int[]
+     *
+     * @since 3.8
+     */
+    public function getReservedRoomIds(){
+        return array_map( function ( $reservedRoom ) { return (int)$reservedRoom->getId(); }, $this->reservedRooms );
+    }
+
+    /**
+     * @return int[]
+     *
+     * @since 3.8
+     */
+    public function getRoomIds(){
+        return array_map( function ( $reservedRoom ) { return (int)$reservedRoom->getRoomId(); }, $this->reservedRooms );
+    }
 
 	/**
 	 *

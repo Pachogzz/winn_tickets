@@ -1,4 +1,4 @@
-/*! elementor - v2.9.6 - 12-03-2020 */
+/*! elementor - v2.9.8 - 21-04-2020 */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -7359,10 +7359,6 @@ function (_elementorModules$fro) {
         };
       }
 
-      if (true === swiperOptions.loop) {
-        swiperOptions.loopedSlides = this.getSlidesCount();
-      }
-
       if (isSingleSlide) {
         swiperOptions.effect = elementSettings.effect;
 
@@ -9281,7 +9277,7 @@ module.exports = elementorModules.ViewModule.extend({
     }
   },
   isLightboxLink: function isLightboxLink(element) {
-    if ('A' === element.tagName && (element.hasAttribute('download') || !/^[^?]+\.(png|jpe?g|gif|svg)(\?.*)?$/i.test(element.href))) {
+    if ('A' === element.tagName && (element.hasAttribute('download') || !/^[^?]+\.(png|jpe?g|gif|svg|webp)(\?.*)?$/i.test(element.href))) {
       return false;
     }
 

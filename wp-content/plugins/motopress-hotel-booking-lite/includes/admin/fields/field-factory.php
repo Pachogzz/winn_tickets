@@ -95,6 +95,12 @@ class FieldFactory {
             case 'action-button':
                 return new ActionButtonField($name, $details, $value);
                 break;
+            case 'link-button':
+                return new LinkButtonField($name, $details, $value);
+                break;
+            case 'install-plugin':
+                return new InstallPluginField($name, $details, $value);
+                break;
             default:
                 $type = str_replace('-', '_', $details['type']);
                 return apply_filters("mphb_create_{$type}_field", null, $name, $details, $value);

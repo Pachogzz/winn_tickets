@@ -8,13 +8,14 @@
  * - int $adults
  * - int $children
  * - array $attributes [%Attribute name% => [%Term ID% => %Term title%]]
+ * - array $args
  */
 if ( !defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
 
-<form method="GET" class="mphb_widget_search-form" action="<?php echo esc_attr( $action ); ?>">
+<form method="GET" class="<?php echo esc_attr( apply_filters( 'mphb_widget_search_form_class', 'mphb_widget_search-form', $args ) ); ?>" action="<?php echo esc_attr( $action ); ?>">
 	<p class="mphb-required-fields-tip"><small><?php printf( __( 'Required fields are followed by %s', 'motopress-hotel-booking' ), '<abbr title="required">*</abbr>' ); ?></small></p>
 
 	<?php

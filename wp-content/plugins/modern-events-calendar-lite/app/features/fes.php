@@ -192,7 +192,7 @@ class MEC_feature_fes extends MEC_base
         // Trash the event
         wp_delete_post($post_id);
         
-        $this->main->response(array('success'=>1, 'message'=>__('The event removed!', 'modern-events-calendar-lite')));
+        $this->main->response(array('success'=>1, 'message'=>__('Event removed!', 'modern-events-calendar-lite')));
     }
     
     public function mec_fes_csv_export()
@@ -360,7 +360,7 @@ class MEC_feature_fes extends MEC_base
         if($movefile and !isset($movefile['error']))
         {
             $success = 1;
-            $message = __('The image is uploaded!', 'modern-events-calendar-lite');
+            $message = __('Image uploaded!', 'modern-events-calendar-lite');
             
             $data['url'] = $movefile['url'];
         }
@@ -386,7 +386,7 @@ class MEC_feature_fes extends MEC_base
         if($this->main->get_recaptcha_status('fes'))
         {
             $g_recaptcha_response = isset($_POST['g-recaptcha-response']) ? sanitize_text_field($_POST['g-recaptcha-response']) : NULL;
-            if(!$this->main->get_recaptcha_response($g_recaptcha_response)) $this->main->response(array('success'=>0, 'message'=>__('Captcha is invalid! Please try again.', 'modern-events-calendar-lite'), 'code'=>'CAPTCHA_IS_INVALID'));
+            if(!$this->main->get_recaptcha_response($g_recaptcha_response)) $this->main->response(array('success'=>0, 'message'=>__('Invalid Captcha! Please try again.', 'modern-events-calendar-lite'), 'code'=>'CAPTCHA_IS_INVALID'));
         }
 
         $post_id = isset($mec['post_id']) ? sanitize_text_field($mec['post_id']) : -1;
@@ -521,6 +521,7 @@ class MEC_feature_fes extends MEC_base
 
                     $latitude = (isset($mec['location']['latitude']) and trim($mec['location']['latitude'])) ? sanitize_text_field($mec['location']['latitude']) : 0;
                     $longitude = (isset($mec['location']['longitude']) and trim($mec['location']['longitude'])) ? sanitize_text_field($mec['location']['longitude']) : 0;
+                    $url = (isset($mec['location']['url']) and trim($mec['location']['url'])) ? esc_url($mec['location']['url']) : '';
                     $thumbnail = (isset($mec['location']['thumbnail']) and trim($mec['location']['thumbnail'])) ? sanitize_text_field($mec['location']['thumbnail']) : '';
 
                     if(!trim($latitude) or !trim($longitude))
@@ -534,6 +535,7 @@ class MEC_feature_fes extends MEC_base
                     update_term_meta($location_id, 'address', $address);
                     update_term_meta($location_id, 'latitude', $latitude);
                     update_term_meta($location_id, 'longitude', $longitude);
+                    update_term_meta($location_id, 'url', $url);
                     update_term_meta($location_id, 'thumbnail', $thumbnail);
                 }
                 else $location_id = 1;
@@ -1038,6 +1040,17 @@ class MEC_feature_fes extends MEC_base
         update_post_meta($post_id, 'mec_op', $op);
         update_user_meta(get_post_field('post_author', $post_id), 'mec_op', $op);
 
+        // SEO Schema
+        $event_status = isset($mec['event_status']) ? sanitize_text_field($mec['event_status']) : 'EventScheduled';
+        if(!in_array($event_status, array('EventScheduled', 'EventPostponed', 'EventCancelled', 'EventMovedOnline'))) $event_status = 'EventScheduled';
+        update_post_meta($post_id, 'mec_event_status', $event_status);
+
+        $moved_online_link = (isset($mec['moved_online_link']) and filter_var($mec['moved_online_link'], FILTER_VALIDATE_URL)) ? esc_url($mec['moved_online_link']) : '';
+        update_post_meta($post_id, 'mec_moved_online_link', $moved_online_link);
+
+        $cancelled_reason = (isset($mec['cancelled_reason']) and filter_var($mec['cancelled_reason'], FILTER_VALIDATE_URL)) ? esc_url($mec['cancelled_reason']) : '';
+        update_post_meta($post_id, 'mec_cancelled_reason', $cancelled_reason);
+
         do_action('save_fes_meta_action' , $post_id , $mec);
 
         if($booking_date_update)
@@ -1094,10 +1107,12 @@ class MEC_feature_fes extends MEC_base
         }
 
         // For Event Notification Badge.
-        update_post_meta($post_id, 'mec_event_date_submit', date('YmdHis', current_time('timestamp', 0)));
+        if(isset($_REQUEST['mec']['post_id']) and trim($_REQUEST['mec']['post_id']) == '-1') {
+            update_post_meta($post_id, 'mec_event_date_submit', date('YmdHis', current_time('timestamp', 0)));
+        }
 
         $message = '';
-        if($status == 'pending') $message = __('The event submitted. It will publish as soon as possible.', 'modern-events-calendar-lite');
+        if($status == 'pending') $message = __('Event submitted. It will publish as soon as possible.', 'modern-events-calendar-lite');
         elseif($status == 'publish') $message = __('The event published.', 'modern-events-calendar-lite');
         
         // Trigger Event

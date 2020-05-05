@@ -564,7 +564,7 @@ function mphb_tmpl_the_room_reservation_form( $roomType = null ){
 				<abbr title="<?php printf( _x( 'Formatted as %s', 'Date format tip', 'motopress-hotel-booking' ), MPHB()->settings()->dateTime()->getDateFormatJS() ); ?>">*</abbr>
 			</label>
 			<br />
-			<input id="<?php echo esc_attr( 'mphb_check_in_date-' . $uniqueSuffix ); ?>" type="text" class="mphb-datepick" value="<?php echo esc_attr( $checkInDateFormatted ); ?>" required="required" autocomplete="off"/>
+			<input id="<?php echo esc_attr( 'mphb_check_in_date-' . $uniqueSuffix ); ?>" type="text" class="mphb-datepick" value="<?php echo esc_attr( $checkInDateFormatted ); ?>" required="required" autocomplete="off" placeholder="<?php _e( 'Check-in Date', 'motopress-hotel-booking' ); ?>" />
 			<input id="<?php echo esc_attr( 'mphb_check_in_date-' . $uniqueSuffix . '-hidden' ); ?>" type="hidden" name="mphb_check_in_date" value="<?php echo esc_attr( $checkInDate ); ?>" />
 		</p>
 		<p class="mphb-check-out-date-wrapper">
@@ -573,7 +573,7 @@ function mphb_tmpl_the_room_reservation_form( $roomType = null ){
 				<abbr title="<?php printf( _x( 'Formatted as %s', 'Date format tip', 'motopress-hotel-booking' ), MPHB()->settings()->dateTime()->getDateFormatJS() ); ?>">*</abbr>
 			</label>
 			<br />
-			<input id="<?php echo esc_attr( 'mphb_check_out_date-' . $uniqueSuffix ); ?>" type="text" class="mphb-datepick" value="<?php echo esc_attr( $checkOutDateFormatted ); ?>" required="required" autocomplete="off"/>
+			<input id="<?php echo esc_attr( 'mphb_check_out_date-' . $uniqueSuffix ); ?>" type="text" class="mphb-datepick" value="<?php echo esc_attr( $checkOutDateFormatted ); ?>" required="required" autocomplete="off" placeholder="<?php esc_attr_e( 'Check-out Date', 'motopress-hotel-booking' ); ?>" />
 			<input id="<?php echo esc_attr( 'mphb_check_out_date-' . $uniqueSuffix . '-hidden' ); ?>" type="hidden" name="mphb_check_out_date" value="<?php echo esc_attr( $checkOutDate ); ?>" />
 		</p>
 		<?php if ( !$isDirectBooking ) { ?>

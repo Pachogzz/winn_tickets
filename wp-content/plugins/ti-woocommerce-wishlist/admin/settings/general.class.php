@@ -79,7 +79,7 @@ class TInvWL_Admin_Settings_General extends TInvWL_Admin_BaseSection {
 	 * @return array
 	 */
 	public function get_wp_menus() {
-		$menus     = array( esc_html__( 'Select Your Menu', 'ti-woocommerce-wishlist' ) );
+		$menus     = array();
 		$get_menus = get_terms( 'nav_menu', array( 'hide_empty' => true ) );
 		foreach ( $get_menus as $menu ) {
 			$menus[ $menu->term_id ] = $menu->name;
@@ -211,14 +211,14 @@ class TInvWL_Admin_Settings_General extends TInvWL_Admin_BaseSection {
 						'name'  => 'text_added_to',
 						'text'  => __( '"Product added to Wishlist" Text', 'ti-woocommerce-wishlist' ),
 						'std'   => '&quot;{product_name}&quot; added to Wishlist',
-						'desc'  => __( 'You can use next placeholder in this field to get current product name: <code>{product_name}</code>', 'ti-woocommerce-wishlist' ),
+						'desc'  => __( 'You can use next placeholder in this field to get current product name: <code>{product_name}</code>, <code>{product_sku}</code>', 'ti-woocommerce-wishlist' ),
 						'class' => 'tiwl-button-show-notice',
 					),
 					array(
 						'type'  => 'text',
 						'name'  => 'text_already_in',
 						'text'  => __( '"Product already in Wishlist" Text', 'ti-woocommerce-wishlist' ),
-						'desc'  => __( 'This notification will be shown if user will try to add a product that is already in the wishlist. ', 'ti-woocommerce-wishlist' ) . __( 'You can use next placeholder in this field to get current product name: <code>{product_name}</code>', 'ti-woocommerce-wishlist' ),
+						'desc'  => __( 'This notification will be shown if user will try to add a product that is already in the wishlist. ', 'ti-woocommerce-wishlist' ) . __( 'You can use next placeholder in this field to get current product name: <code>{product_name}</code>, <code>{product_sku}</code>', 'ti-woocommerce-wishlist' ),
 						'std'   => '&quot;{product_name}&quot; already in Wishlist',
 						'class' => 'tiwl-button-show-notice tiwl-general-simple-flow-hide',
 					),
@@ -805,7 +805,7 @@ class TInvWL_Admin_Settings_General extends TInvWL_Admin_BaseSection {
 						'class' => 'tiwl-dropdown-text',
 					),
 					array(
-						'type'    => 'select',
+						'type'    => 'multiselect',
 						'name'    => 'menu',
 						'text'    => __( 'Add counter to menu', 'ti-woocommerce-wishlist' ),
 						'options' => $menus,

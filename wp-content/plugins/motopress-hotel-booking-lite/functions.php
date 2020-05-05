@@ -1154,6 +1154,18 @@ function mphb_get_customer($bookingId)
 }
 
 /**
+ * @param int $roomTypeId
+ * @param bool $force Optional. FALSE by default.
+ * @return \MPHB\Entities\RoomType|null
+ *
+ * @since 3.8
+ */
+function mphb_get_room_type($roomTypeId, $force = false)
+{
+    return MPHB()->getRoomTypeRepository()->findById($roomTypeId, $force);
+}
+
+/**
  * Determine if the current view is the "All" view.
  *
  * @see \WP_Posts_List_Table::is_base_request()
@@ -1233,4 +1245,102 @@ function mphb_is_failed_booking($booking)
 {
     $failedStatuses = MPHB()->postTypes()->booking()->statuses()->getFailedStatuses();
     return in_array($booking->getStatus(), $failedStatuses);
+}
+
+/**
+ * @param \DateTime $from Start date, like check-in date.
+ * @param \DateTime $to End date, like check-out date.
+ * @param array $atts Optional.
+ *     @param int $atts['room_type_id'] Optional. 0 by default (any room type).
+ *     @param int|int[] $atts['exclude_bookings'] Optional. One or more booking IDs.
+ * @return array [Room type ID => [Rooms IDs]] (all IDs - original)
+ *
+ * @since 3.8
+ */
+function mphb_get_available_rooms($from, $to, $atts = array())
+{
+    $roomTypeId = isset($atts['room_type_id']) ? $atts['room_type_id'] : 0;
+    $searchAtts = array();
+
+    if (isset($atts['exclude_bookings'])) {
+        $searchAtts['exclude_bookings'] = $atts['exclude_bookings'];
+    }
+
+    return MPHB()->getRoomRepository()->getAvailableRooms($from, $to, $roomTypeId, $searchAtts);
+}
+
+/**
+ * @param int|string $value
+ * @return int The number in range [0; oo)
+ *
+ * @since 3.8
+ */
+function mphb_posint($value)
+{
+    return max(0, intval($value));
+}
+
+/**
+ * @return int
+ *
+ * @since 3.8
+ */
+function mphb_get_min_adults()
+{
+    return MPHB()->settings()->main()->getMinAdults();
+}
+
+/**
+ * @return int
+ *
+ * @since 3.8
+ */
+function mphb_get_min_children()
+{
+    return MPHB()->settings()->main()->getMinChildren();
+}
+
+/**
+ * @return int
+ *
+ * @since 3.8
+ */
+function mphb_get_max_adults()
+{
+    return MPHB()->settings()->main()->getSearchMaxAdults();
+}
+
+/**
+ * @return int
+ *
+ * @since 3.8
+ */
+function mphb_get_max_children()
+{
+    return MPHB()->settings()->main()->getSearchMaxChildren();
+}
+
+/**
+ * @param array $array Array to flip.
+ * @param bool $arraySingle Optional. Convert single value into array. FALSE by default.
+ * @return array
+ *
+ * @since 3.8
+ */
+function mphb_array_flip_duplicates($array, $arraySingle = false)
+{
+    $values = array_unique($array);
+    $flip = array();
+
+    foreach ($values as $value) {
+        $keys = array_keys($array, $value);
+
+        if ($arraySingle || count($keys) > 1) {
+            $flip[$value] = $keys;
+        } else {
+            $flip[$value] = reset($keys);
+        }
+    }
+
+    return $flip;
 }

@@ -12,6 +12,8 @@ class MEC_skin_slider extends MEC_skins
      * @var string
      */
     public $skin = 'slider';
+    public $display_price;
+    public $display_available_tickets;
     
     /**
      * Constructor method
@@ -90,7 +92,13 @@ class MEC_skin_slider extends MEC_skins
 		if($this->widget)
         {
 			$this->skin_options['count'] = '1';
-		}
+        }
+        
+        // Fluent view - Display Price
+        $this->display_price = (isset($this->skin_options['display_price']) and trim($this->skin_options['display_price'])) ? true : false;
+
+        // Fluent view - Available Tickets
+        $this->display_available_tickets = (isset($this->skin_options['display_available_tickets']) and trim($this->skin_options['display_available_tickets'])) ? $this->skin_options['display_available_tickets'] : '';
         
         // The count in row
         $this->count = isset($this->skin_options['count']) ? $this->skin_options['count'] : '3';
@@ -123,6 +131,12 @@ class MEC_skin_slider extends MEC_skins
         // Pagination Options
         $this->paged = get_query_var('paged', 1);
         $this->limit = (isset($this->skin_options['limit']) and trim($this->skin_options['limit'])) ? $this->skin_options['limit'] : 12;
+
+        // reason_for_cancellation
+        $this->reason_for_cancellation = isset($this->skin_options['reason_for_cancellation']) ? $this->skin_options['reason_for_cancellation'] : false;
+
+        // display_label
+        $this->display_label = isset($this->skin_options['display_label']) ? $this->skin_options['display_label'] : false;
         
         $this->args['posts_per_page'] = $this->limit;
         $this->args['paged'] = $this->paged;
@@ -156,6 +170,8 @@ class MEC_skin_slider extends MEC_skins
         
         // Found Events
         $this->found = 0;
+
+        do_action('mec-slider-initialize-end', $this);
     }
     
     /**

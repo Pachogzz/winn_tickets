@@ -30,14 +30,13 @@ if($this->main->is_ajax()) echo $javascript;
 else $this->factory->params('footer', $javascript);
 
 $styling = $this->main->get_styling();
-
 $event_colorskin = (isset($styling['mec_colorskin'] ) || isset($styling['color'])) ? 'colorskin-custom' : '';
-$dark_mode = ( isset($styling['dark_mode']) ) ? $styling['dark_mode'] : '';
-if ( $dark_mode == 1 ): $set_dark = 'mec-dark-mode';
-else: $set_dark ='';
-endif;
 
-do_action('mec_start_skin' , $this->id);
+$dark_mode = isset($styling['dark_mode']) ? $styling['dark_mode'] : '';
+if($dark_mode == 1) $set_dark = 'mec-dark-mode';
+else $set_dark = '';
+
+do_action('mec_start_skin', $this->id);
 do_action('mec_full_skin_head');
 ?>
 <div id="mec_skin_<?php echo $this->id; ?>" class="mec-wrap <?php echo $event_colorskin . ' ' . $set_dark; ?> mec-full-calendar-wrap">
@@ -52,7 +51,7 @@ do_action('mec_full_skin_head');
             $sf_month_filter_status = true;
             $sf_text_search_status = true;
 
-            $sf_columns = 8;
+            $sf_columns = 7;
         ?>
         <div id="mec_search_form_<?php echo $this->id; ?>">
         <?php if($sf_month_filter_status): $sf_columns -= 3; ?>
@@ -67,7 +66,7 @@ do_action('mec_full_skin_head');
             </div>        
         <?php endif; ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <div class="mec-totalcal-view">
                 <?php if($this->yearly): ?><span class="mec-totalcal-yearlyview<?php if($this->default_view == 'yearly') echo ' mec-totalcalview-selected'; ?>" data-skin="yearly"><?php _e('Yearly', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
                 <?php if($this->monthly): ?><span class="mec-totalcal-monthlyview<?php if($this->default_view == 'monthly') echo ' mec-totalcalview-selected'; ?>" data-skin="monthly"><?php _e('Monthly', 'modern-events-calendar-lite'); ?></span><?php endif; ?>

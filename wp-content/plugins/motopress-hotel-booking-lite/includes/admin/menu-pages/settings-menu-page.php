@@ -145,17 +145,6 @@ class SettingsMenuPage extends AbstractMenuPage {
 				'inner_label'	 => __( 'Enable the use of coupons.', 'motopress-hotel-booking' ),
 				'default'		 => false
 			) ),
-			Fields\FieldFactory::create( 'mphb_template_mode', array(
-				'type'			 => 'select',
-				'label'			 => __( 'Template Mode', 'motopress-hotel-booking' ),
-				'list'			 => array(
-					'plugin' => __( 'Developer Mode', 'motopress-hotel-booking' ),
-					'theme'	 => __( 'Theme Mode', 'motopress-hotel-booking' )
-				),
-				'description'	 => __( 'Choose Theme Mode to display the content with the styles of your theme. Choose Developer Mode to control appearance of the content with custom page templates, actions and filters. This option can\'t be changed if your theme is initially integrated with the plugin.', 'motopress-hotel-booking' ),
-				'disabled'		 => current_theme_supports( 'motopress-hotel-booking' ),
-				'default'		 => 'theme'
-			) ),
 			Fields\FieldFactory::create( 'mphb_checkout_text', array(
 				'type'			 => 'rich-editor',
 				'label'			 => __( 'Text on Checkout', 'motopress-hotel-booking' ),
@@ -334,8 +323,32 @@ class SettingsMenuPage extends AbstractMenuPage {
 				'default'		 => '',
 				'label'			 => __( 'Calendar Theme', 'motopress-hotel-booking' ),
 				'description'	 => __( 'Select theme for an availability calendar.', 'motopress-hotel-booking' )
+			) ),
+			Fields\FieldFactory::create( 'mphb_template_mode', array(
+				'type'			 => 'select',
+				'label'			 => __( 'Template Mode', 'motopress-hotel-booking' ),
+				'list'			 => array(
+					'plugin' => __( 'Developer Mode', 'motopress-hotel-booking' ),
+					'theme'	 => __( 'Theme Mode', 'motopress-hotel-booking' )
+				),
+				'description'	 => __( 'Choose Theme Mode to display the content with the styles of your theme. Choose Developer Mode to control appearance of the content with custom page templates, actions and filters. This option can\'t be changed if your theme is initially integrated with the plugin.', 'motopress-hotel-booking' ),
+				'disabled'		 => current_theme_supports( 'motopress-hotel-booking' ),
+				'default'		 => 'theme'
 			) )
 		);
+
+        // Since 3.8.1
+        if (!defined('MPHB\Styles\VERSION')) {
+            $displayFields[] = Fields\FieldFactory::create('mphb_install_styles_addon', array(
+                'type'           => 'install-plugin',
+                'label'          => __('More Styles', 'motopress-hotel-booking'),
+                'text'           => __('Extend the styling options of Hotel Booking plugin with the new free addon - Hotel Booking Styles.', 'motopress-hotel-booking'),
+                'button_classes' => 'button button-primary',
+                'plugin_slug'    => 'mphb-styles/mphb-styles.php',
+                'plugin_zip'     => 'https://downloads.wordpress.org/plugin/mphb-styles.zip',
+                'redirect'       => admin_url('admin.php?page=mphb_settings&tab=extensions&subtab=mphb_styles')
+            ));
+        }
 
         $this->filterGroupFields($displayFields, $displayGroup->getName());
 		$displayGroup->addFields( $displayFields );

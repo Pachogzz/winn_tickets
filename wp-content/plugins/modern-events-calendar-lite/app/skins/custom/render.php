@@ -1,15 +1,15 @@
 <?php
 /** no direct access **/
 defined('MECEXEC') or die();
+
 use Elementor\Plugin;
-if ( ! did_action( 'elementor/loaded' ) ) {
-    return;
-}
+if(!did_action('elementor/loaded')) return;
 
 $styling = $this->main->get_styling();
 $event_colorskin = (isset($styling['mec_colorskin'] ) || isset($styling['color'])) ? 'colorskin-custom' : '';
 $settings = $this->main->get_settings();
 $current_month_divider = $this->request->getVar('current_month_divider', 0);
+
 // colorful
 $colorful_flag = $colorful_class = '';
 if($this->style == 'colorful')
@@ -141,11 +141,14 @@ if($this->style == 'colorful')
 </div>
 
 <?php
-foreach ($map_events as $key => $value) {
-    foreach ($value as $keyy => $valuee) {
-        $map_eventss[] = $valuee;
+$map_eventss = array();
+if ( isset($map_events) && !empty($map_events)) :
+    foreach ($map_events as $key => $value) {
+        foreach ($value as $keyy => $valuee) {
+            $map_eventss[] = $valuee;
+        }
     }
-}
+endif;
 
 if ( isset($this->map_on_top) and $this->map_on_top ) :
 if(isset($map_eventss) and !empty($map_eventss))

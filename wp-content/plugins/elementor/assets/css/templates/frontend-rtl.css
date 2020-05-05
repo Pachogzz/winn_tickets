@@ -1058,6 +1058,9 @@ ul.elementor-icon-list-items.elementor-inline-items {
     padding: 8px 24px;
     border-radius: 6px; }
 
+.elementor-button-align-center .elementor-field-type-submit button, .elementor-button-align-start .elementor-field-type-submit button, .elementor-button-align-end .elementor-field-type-submit button {
+  flex-basis: initial; }
+
 .elementor-button-align-center .elementor-field-type-submit {
   justify-content: center; }
 
@@ -1071,6 +1074,8 @@ ul.elementor-icon-list-items.elementor-inline-items {
   justify-content: flex-start; }
 
 @media screen and (max-width: ELEMENTOR_SCREEN_MD_MAX) {
+  .elementor-tablet-button-align-center .elementor-field-type-submit button, .elementor-tablet-button-align-start .elementor-field-type-submit button, .elementor-tablet-button-align-end .elementor-field-type-submit button {
+    flex-basis: initial; }
   .elementor-tablet-button-align-center .elementor-field-type-submit {
     justify-content: center; }
   .elementor-tablet-button-align-stretch .elementor-field-type-submit button {
@@ -1081,6 +1086,8 @@ ul.elementor-icon-list-items.elementor-inline-items {
     justify-content: flex-start; } }
 
 @media screen and (max-width: ELEMENTOR_SCREEN_SM_MAX) {
+  .elementor-mobile-button-align-center .elementor-field-type-submit button, .elementor-mobile-button-align-start .elementor-field-type-submit button, .elementor-mobile-button-align-end .elementor-field-type-submit button {
+    flex-basis: initial; }
   .elementor-mobile-button-align-center .elementor-field-type-submit {
     justify-content: center; }
   .elementor-mobile-button-align-stretch .elementor-field-type-submit button {
@@ -3013,6 +3020,8 @@ button.swiper-pagination-bullet {
   position: absolute;
   overflow: hidden;
   transition: background-color 400ms; }
+  .elementor-slideshow__share-menu .elementor-slideshow__share-links a {
+    color: #2C2C2C; }
 
 .elementor-slideshow__share-links {
   display: block;
@@ -3021,7 +3030,6 @@ button.swiper-pagination-bullet {
   left: 67px;
   top: 60px;
   background-color: #fff;
-  color: #2C2C2C;
   border-radius: 3px;
   font-size: 16px;
   padding: 14px 20px;

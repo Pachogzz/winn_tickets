@@ -477,14 +477,14 @@ class BookingsCalendar {
 					<?php $this->renderDatesTable(); ?>
 				</div>
 			</div>
-            <div id="mphb-bookings-calendar-popup" class="mphb-hide">
+            <div id="mphb-bookings-calendar-popup" class="mphb-popup mphb-hide">
                 <div class="mphb-popup-backdrop"></div>
                 <div class="mphb-popup-body">
                     <div class="mphb-header">
                         <h2 class="mphb-title mphb-inline"><?php _e('Booking #%s', 'motopress-hotel-booking'); ?></h2>
                         <span class="mphb-preloader mphb-hide"></span>
                         <span class="mphb-status mphb-hide"><?php _ex('Confirmed', 'Booking status', 'motopress-hotel-booking'); ?></span>
-                        <button class="mphb-close dashicons dashicons-no-alt"></button>
+                        <button class="mphb-close-popup-button dashicons dashicons-no-alt"></button>
                     </div>
                     <div class="mphb-content"></div>
                     <div class="mphb-footer">

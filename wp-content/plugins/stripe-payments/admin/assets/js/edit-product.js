@@ -20,6 +20,7 @@ jQuery(document).ready(function ($) {
 		$(tpl_html).closest('div.asp-variations-group-cont').attr('data-asp-group-id', aspGroupId);
 		$('div#asp-variations-cont').append(tpl_html);
 		if (focus) {
+			asp_add_variation(aspGroupId, '', 0, '', false);
 			$(tpl_html).find('input.asp-variations-group-name').focus();
 		}
 	}
@@ -91,9 +92,7 @@ jQuery(document).ready(function ($) {
 				});
 			}
 		});
-		if (aspVariationsGroupsId !== 0) {
-			aspVariationsGroupsId++;
-		}
+		aspVariationsGroupsId++;
 	}
 	$('input[name="asp_product_collect_billing_addr"]').change(function () {
 		var checked = $(this).is(':checked');
@@ -131,4 +130,9 @@ jQuery(document).ready(function ($) {
 			$('a.wp-asp-product-menu-nav-item').css('display', 'block');
 		}
 	});
+
+	$('input[name="asp_product_price"]').on('change', function (e) {
+		$('input[name="asp_product_hide_amount_input"]').prop('disabled', !($(this).val() == 0));
+	});
+	$('input[name="asp_product_price"]').trigger('change');
 });

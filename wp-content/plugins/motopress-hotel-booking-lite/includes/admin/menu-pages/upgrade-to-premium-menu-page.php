@@ -19,6 +19,7 @@ class UpgradeToPremiumMenuPage extends AbstractMenuPage {
 				<li><?php _e( 'Bookings synchronization with OTAs (exchange calendars via iCal).', 'motopress-hotel-booking' ); ?></li>
 				<li><?php _e( 'Attributes (Adding extra sorting options to the search availability form).', 'motopress-hotel-booking' ); ?></li>
 				<li><?php _e( 'Adding reservations from the backend.', 'motopress-hotel-booking' ); ?></li>
+				<li><?php _e( 'The ability to edit original booking details (dates, accommodations, services, etc.)', 'motopress-hotel-booking' ); ?></li>
 				<li><?php _e( 'Different property prices based on a number of guests and nights.', 'motopress-hotel-booking' ); ?></li>
 				<li><?php _e( 'Export bookings data in the CSV format.', 'motopress-hotel-booking' ); ?></li>
 			</ol>
