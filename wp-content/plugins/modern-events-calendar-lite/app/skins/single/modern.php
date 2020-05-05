@@ -4,19 +4,21 @@ defined('MECEXEC') or die();
 
 $booking_options = get_post_meta(get_the_ID(), 'mec_booking', true);
 if(!is_array($booking_options)) $booking_options = array();
+$display_reason = get_post_meta(get_the_ID(), 'mec_display_cancellation_reason_in_single_page', true);
 ?>
 <div class="mec-wrap <?php echo $event_colorskin; ?> clearfix <?php echo $this->html_class; ?>" id="mec_skin_<?php echo $this->uniqueid; ?>">
     <article class="row mec-single-event mec-single-modern">
+
         <!-- start breadcrumbs -->
         <?php
         $breadcrumbs_settings = isset( $settings['breadcrumbs'] ) ? $settings['breadcrumbs'] : '';
-        if($breadcrumbs_settings == '1'):
-            $breadcrumbs = new MEC_skin_single; ?>
+        if($breadcrumbs_settings == '1'): $breadcrumbs = new MEC_skin_single(); ?>
             <div class="mec-breadcrumbs mec-breadcrumbs-modern">
                 <?php $breadcrumbs->display_breadcrumb_widget(get_the_ID()); ?>
             </div>
         <?php endif; ?>
         <!-- end breadcrumbs -->
+
         <div class="mec-events-event-image"><?php echo $event->data->thumbnails['full']; ?><?php do_action('mec_custom_dev_image_section', $event); ?></div>
         <div class="col-md-4">
             
@@ -102,6 +104,14 @@ if(!is_array($booking_options)) $booking_options = array();
                             <h3 class="mec-events-single-section-title mec-location"><?php echo $this->main->m('taxonomy_location', __('Location', 'modern-events-calendar-lite')); ?></h3>
                             <dd class="author fn org"><?php echo (isset($location['name']) ? $location['name'] : ''); ?></dd>
                             <dd class="location"><address class="mec-events-address"><span class="mec-address"><?php echo (isset($location['address']) ? $location['address'] : ''); ?></span></address></dd>
+
+                            <?php if(isset($location['url']) and trim($location['url'])): ?>
+                            <dd class="mec-location-url">
+                                <i class="mec-sl-sitemap"></i>
+                                <h6><?php _e('Website', 'modern-events-calendar-lite'); ?></h6>
+                                <span><a href="<?php echo (strpos($location['url'], 'http') === false ? 'http://'.$location['url'] : $location['url']); ?>" class="mec-color-hover" target="_blank"><?php echo $location['url']; ?></a></span>
+                            </dd>
+                            <?php endif; ?>
                         </div>
                         <?php
                         $this->show_other_locations($event); // Show Additional Locations
@@ -240,6 +250,7 @@ if(!is_array($booking_options)) $booking_options = array();
             </div>
 
             <div class="mec-event-content">
+                <?php echo $this->main->display_cancellation_reason($event->data->ID, $display_reason); ?>
                 <h1 class="mec-single-title"><?php the_title(); ?></h1>
                 <div class="mec-single-event-description mec-events-content"><?php the_content(); ?><?php do_action('mec_custom_dev_content_section' , $event); ?></div>
             </div>
@@ -293,55 +304,12 @@ if(!is_array($booking_options)) $booking_options = array();
     <?php $this->display_related_posts_widget($event->ID); ?>
 </div>
 <?php
-$speakers = '""';
-if(!empty($event->data->speakers))
-{
-    $speakers= [];
-    foreach($event->data->speakers as $key => $value)
-    {
-        $speakers[] = array(
-            "@type" 	=> "Person",
-            "name"		=> $value['name'],
-            "image"		=> $value['thumbnail'],
-            "sameAs"	=> $value['facebook'],
-        );
-    }
-
-    $speakers = json_encode($speakers);
-}
-$schema_settings = isset( $settings['schema'] ) ? $settings['schema'] : '';
-if($schema_settings == '1' ):
+    // MEC Schema
+    do_action('mec_schema', $event);
 ?>
-<script type="application/ld+json">
-{
-	"@context" 		: "http://schema.org",
-	"@type" 		: "Event",
-	"startDate" 	: "<?php echo !empty($event->data->meta['mec_date']['start']['date']) ? $event->data->meta['mec_date']['start']['date'] : '' ; ?>",
-	"endDate" 		: "<?php echo !empty($event->data->meta['mec_date']['end']['date']) ? $event->data->meta['mec_date']['end']['date'] : '' ; ?>",
-	<?php if(isset($location) and is_array($location)): ?>
-	"location" 		:
-	{
-		"@type" 		: "Place",
-		"name" 			: "<?php echo (isset($location['name']) ? $location['name'] : ''); ?>",
-		"image"			: "<?php echo esc_url($location['thumbnail'] ); ?>",
-		"address"		: "<?php echo (isset($location['address']) ? $location['address'] : ''); ?>"
-	},
-	<?php endif; ?>
-    "offers": {
-        "url": "<?php echo get_the_permalink(); ?>",
-        "price": "<?php if ( !empty( $event->data->meta['mec_cost'] ) ) echo $event->data->meta['mec_cost']; ?>",
-        "priceCurrency" : "<?php echo isset($settings['currency']) ? $settings['currency'] : ''; ?>"
-    },
-	"performer": <?php echo $speakers; ?>,
-	"description" 	: "<?php  echo esc_html(preg_replace('/<p>\\s*?(<a .*?><img.*?><\\/a>|<img.*?>)?\\s*<\\/p>/s', '<div class="figure">$1</div>', preg_replace('/\s/u', ' ', get_the_content()))); ?>",
-	"image" 		: "<?php echo esc_html($event->data->featured_image['full']); ?>",
-	"name" 			: "<?php esc_html_e(get_the_title()); ?>",
-	"url"			: "<?php the_permalink(); ?>"
-}
-</script>
-<?php endif; ?>
 <script>
-jQuery( ".mec-speaker-avatar a" ).click(function(e) {
+jQuery( ".mec-speaker-avatar a" ).click(function(e)
+{
     e.preventDefault();
     var id =  jQuery(this).attr('href');
     lity(id);
@@ -350,7 +318,8 @@ jQuery( ".mec-speaker-avatar a" ).click(function(e) {
 // Fix modal booking in some themes
 function openBookingModal()
 {
-    jQuery( ".mec-booking-button.mec-booking-data-lity" ).on('click',function(e) {
+    jQuery( ".mec-booking-button.mec-booking-data-lity" ).on('click',function(e)
+    {
         e.preventDefault();
         var book_id =  jQuery(this).attr('href');
         lity(book_id);

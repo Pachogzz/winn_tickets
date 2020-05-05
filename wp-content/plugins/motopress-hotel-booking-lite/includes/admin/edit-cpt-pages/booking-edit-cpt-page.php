@@ -76,7 +76,14 @@ class BookingEditCPTPage extends EditCPTPage {
 
 		$reservedRooms = MPHB()->getReservedRoomRepository()->findAllByBooking( $post->ID );
 
-        mphb_tmpl_the_reserved_rooms_details($reservedRooms);
+        mphb_tmpl_the_reserved_rooms_details( $reservedRooms );
+
+        $booking = mphb_get_booking( $post->ID );
+
+        if ( !is_null( $booking ) && !$booking->isImported() ) {
+            $editBookingUrl = MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $post->ID ) );
+            echo '<a href="' . esc_url( $editBookingUrl ) . '" class="button">', __( 'Edit Accommodations', 'motopress-hotel-booking' ), '</a>';
+        }
 	}
 
 	public function renderLogMetaBox( $post, $metabox ){

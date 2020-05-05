@@ -64,7 +64,8 @@ class AdminScriptManager extends ScriptManager {
     /**
      * @return array
      *
-     * @since 3.7.0 added new filter - "mphb_custom_admin_nonces".
+     * @since 3.7 added new filter - "mphb_custom_admin_nonces".
+     * @since 3.8 added new filter - "mphb_public_js_data".
      */
 	public function getLocalizeData(){
 		$currencySymbol = MPHB()->settings()->currency()->getCurrencySymbol();
@@ -130,6 +131,8 @@ class AdminScriptManager extends ScriptManager {
 
 		$data['_data']['settings']['isAttributesCustomOrder'] = $isAttributesCustomOrder;
 		$data['_data']['settings']['editTaxonomyName'] = isset( $_GET['taxonomy'] ) ? mphb_clean( wp_unslash( $_GET['taxonomy'] ) ) : '';
+
+        $data = apply_filters('mphb_admin_js_data', $data);
 
 		return $data;
 	}

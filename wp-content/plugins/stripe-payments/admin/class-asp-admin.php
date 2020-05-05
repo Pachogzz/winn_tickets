@@ -527,6 +527,22 @@ class AcceptStripePayments_Admin {
 				) . $country_autodetect_addon_txt,
 			)
 		);
+
+		add_settings_field(
+			'hide_state_field',
+			__( 'Hide the State Field', 'stripe-payments' ) . $new_api_str,
+			array( &$this, 'settings_field_callback' ),
+			$this->plugin_slug,
+			'AcceptStripePayments-global-section',
+			array(
+				'field' => 'hide_state_field',
+				'desc'  => __(
+					'Hide the State field on the payment popup window. The State field for the address is an optional field.',
+					'stripe-payments'
+				),
+			)
+		);
+
 		add_settings_field(
 			'prefill_wp_user_details',
 			__( 'Prefill Logged In User Name and Email', 'stripe-payments' ) . $new_api_str,
@@ -1051,7 +1067,7 @@ class AcceptStripePayments_Admin {
 			)
 		);
 		add_settings_field(
-			'dont_create_order',
+			'pp_additional_css',
 			__( 'Payment Popup Additional CSS', 'stripe-payments' ),
 			array( &$this, 'settings_field_callback' ),
 			$this->plugin_slug . '-advanced',
@@ -1226,6 +1242,7 @@ class AcceptStripePayments_Admin {
 			case 'dont_create_order':
 			case 'enable_email_schedule':
 			case 'frontend_prefetch_scripts':
+			case 'hide_state_field':
 				echo "<input type='checkbox' name='AcceptStripePayments-settings[{$field}]' value='1' " . ( $field_value ? 'checked=checked' : '' ) . " /><p class=\"description\">{$desc}</p>";
 				break;
 			case 'prefill_wp_user_details':
@@ -1413,6 +1430,8 @@ class AcceptStripePayments_Admin {
 		$output['prefill_wp_user_details']         = empty( $input['prefill_wp_user_details'] ) ? 0 : 1;
 		$output['prefill_wp_user_last_name_first'] = empty( $input['prefill_wp_user_last_name_first'] ) ? 0 : 1;
 
+		$output['hide_state_field'] = empty( $input['hide_state_field'] ) ? 0 : 1;
+
 		$output['send_emails_to_buyer'] = empty( $input['send_emails_to_buyer'] ) ? 0 : 1;
 
 		$output['stripe_receipt_email'] = empty( $input['stripe_receipt_email'] ) ? 0 : 1;
@@ -1565,6 +1584,9 @@ class AcceptStripePayments_Admin {
 			set_transient( 'wp-asp-urlHash', $_POST['wp-asp-urlHash'], 300 );
 		}
 
+		//regen ckey
+		ASP_Utils::get_ckey( true );
+
 		return $output;
 	}
 
@@ -1613,6 +1635,7 @@ class AcceptStripePayments_Admin {
 				'{currency_code}'     => __( '3-letter currency code. Example: USD', 'stripe-payments' ),
 				'{purchase_date}'     => __( 'The date of the purchase', 'stripe-payments' ),
 				'{custom_field}'      => __( 'Custom field name and value (if enabled)', 'stripe-payments' ),
+				'{coupon_code}'       => __( 'Coupon code (if available)', 'stripe-payments' ),
 			);
 		}
 

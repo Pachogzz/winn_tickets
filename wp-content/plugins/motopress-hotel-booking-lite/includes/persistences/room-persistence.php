@@ -40,27 +40,27 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
 
     /**
      * @param array $atts
-     * @param string $atts['availability'] Optional. Accepts 'free', 'locked',
-     * 'booked', 'pending'. Default is 'free'.
-     *     free - has no bookings with status complete or pending for this days.
-     *     locked - has bookings with status complete or pending for this days.
-     *     booked - has bookings with status complete for this days.
-     *     pending - has bookings with status pending for this days.
-     * @param \DateTime $atts['from_date'] Optional. Default is today.
-     * @param \DateTime $atts['to_date'] Optional. Default is today.
-     * @param int $atts['count'] Optional. Count of rooms to search.
-     * @param int $atts['room_type_id'] Optional. Type of rooms to search.
-     * @param int $atts['exclude_booking'] Optional. ID of booking to exclude
-     * from locked rooms list.
-     * @param array $atts['exclude_rooms'] Optional. IDs of rooms to exclude
-     * from locked rooms list.
-     * @return string[] Array of room IDs.
+     *     @param string $atts['availability'] Optional. Accepts "free", "locked",
+     *         "booked" or "pending". Default is "free".
+     *         "free" - has no bookings with status complete or pending for this days.
+     *         "locked" - has bookings with status complete or pending for this days.
+     *         "booked" - has bookings with status complete for this days.
+     *         "pending" - has bookings with status pending for this days.
+     *     @param \DateTime $atts['from_date'] Optional. Default is today.
+     *     @param \DateTime $atts['to_date'] Optional. Default is today.
+     *     @param int $atts['count'] Optional. Count of rooms to search.
+     *     @param int $atts['room_type_id'] Optional. Type of rooms to search.
+     *     @param int $atts['exclude_booking'] Deprecated. Use "exclude_bookings" instead.
+     *     @param int|int[] $atts['exclude_bookings'] Optional. One or more IDs
+     *         of booking to exclude from locked rooms list.
+     *     @param array $atts['exclude_rooms'] Optional. IDs of rooms to exclude
+     *         from locked rooms list.
+     * @return string[] Array of room IDs. Will always return original IDs because
+     *     of direct query to the DB.
      *
      * @global \WPDB $wpdb
      *
-     * @since 3.7.0 added new filter - "mphb_search_rooms_query_atts".
-     * @since 3.7.0 added new filter - "mphb_search_rooms_query".
-     * @since 3.7.0 added new filter - "mphb_search_rooms_second_query_atts".
+     * @since 3.7.0 added new filters: "mphb_search_rooms_query_atts", "mphb_search_rooms_query" and "mphb_search_rooms_second_query_atts".
      */
     public function searchRooms($atts = array())
     {
@@ -72,12 +72,18 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
             'to_date'			 => new \DateTime(current_time('mysql')),
             'count'				 => null,
             'room_type_id'		 => null,
-            'exclude_booking'	 => null,
+            'exclude_bookings'	 => array(),
             'exclude_rooms'		 => null
         );
 
         $atts = array_merge($defaultAtts, $atts);
         $atts = apply_filters('mphb_search_rooms_query_atts', $atts, $defaultAtts);
+
+        if (isset($atts['exclude_bookings'])) $excludeBookings = $atts['exclude_bookings'];
+        else if (isset($atts['exclude_booking'])) $excludeBookings = $atts['exclude_booking'];
+        else $excludeBookings = array();
+
+        if (!is_array($excludeBookings)) $excludeBookings = (array)$excludeBookings;
 
         switch ($atts['availability']) {
             case 'free':
@@ -113,8 +119,8 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
         );
         $orderBy = array();
 
-        if (!is_null($atts['exclude_booking'])) {
-            $where[] = $wpdb->prepare("bookings.ID != %d", $atts['exclude_booking']);
+        if (!empty($excludeBookings)) {
+            $where[] = $wpdb->prepare("bookings.ID NOT IN (%s)", implode(', ', $excludeBookings));
         }
 
         // For "free" we'll handle "room_type_id" and "count" is second query
@@ -212,27 +218,33 @@ class RoomPersistence extends RoomTypeDependencedPersistence {
 	/**
 	 * @param \DateTime $checkInDate
 	 * @param \DateTime $checkOutDate
-	 * @param array $rooms
-	 * @param int|null $roomTypeId
+	 * @param array $rooms Rooms to check.
+	 * @param array $args Optional.
+     *     @param int $args['room_type_id']
+     *     @param int|int[] $args['exclude_bookings']
 	 * @return bool
      *
-     * @since 3.7.0 added new filter - "mphb_is_rooms_free_query_atts".
+     * @since 3.7 added new filter - "mphb_is_rooms_free_query_atts".
+     * @since 3.8 parameter $roomTypeId was replaced with $args. Added new arguments: "room_type_id" and "exclude_bookings".
 	 */
-	public function isRoomsFree( \DateTime $checkInDate, \DateTime $checkOutDate, $rooms, $roomTypeId = null ){
+	public function isRoomsFree( \DateTime $checkInDate, \DateTime $checkOutDate, $rooms, $args = array() ){
 		$searchAtts = array(
 			'availability'	 => 'free',
 			'from_date'		 => $checkInDate,
 			'to_date'		 => $checkOutDate
 		);
 
-		if ( !is_null( $roomTypeId ) ) {
-			$searchAtts['room_type_id'] = (int)$roomTypeId;
+		if ( isset( $args['room_type_id'] ) ) {
+			$searchAtts['room_type_id'] = (int)$args['room_type_id'];
 		}
+
+        if ( isset( $args['exclude_bookings'] ) ) {
+            $searchAtts['exclude_bookings'] = $args['exclude_bookings'];
+        }
 
         $searchAtts = apply_filters('mphb_is_rooms_free_query_atts', $searchAtts);
 
 		$freeRooms = $this->searchRooms( $searchAtts );
-
 		$availableRooms = array_intersect( $rooms, $freeRooms );
 
 		return ( count( $rooms ) == count( $availableRooms ) );

@@ -113,7 +113,7 @@ class SearchAvailabilityWidget extends BaseWidget {
 
 		$this->uniqid = uniqid();
 
-		$this->renderMain();
+		$this->renderMain( $instance );
 
 		echo $args['after_widget'];
 	}
@@ -144,17 +144,31 @@ class SearchAvailabilityWidget extends BaseWidget {
 		return $instance;
 	}
 
-	private function renderMain(){
+    /**
+     * @param array $instance
+     *
+     * @since 3.8.1 added new filter - "{$widget_id}_template_args".
+     */
+	private function renderMain( $instance ){
 
-		$templateAtts = array(
-			'action'		 => MPHB()->settings()->pages()->getSearchResultsPageUrl(),
-			'uniqid'		 => $this->uniqid,
-			'adults'		 => $this->adults,
-			'children'		 => $this->children,
-			'checkInDate'	 => !is_null( $this->checkInDate ) ? $this->checkInDate->format( MPHB()->settings()->dateTime()->getDateFormat() ) : '',
-			'checkOutDate'	 => !is_null( $this->checkOutDate ) ? $this->checkOutDate->format( MPHB()->settings()->dateTime()->getDateFormat() ) : '',
-			'attributes'	 => $this->attributes
-		);
+        $templateArgs = apply_filters(
+            "{$this->id_base}_template_args",
+            array(
+                'adults'       => $this->adults,
+                'children'     => $this->children,
+                'checkInDate'  => !is_null( $this->checkInDate ) ? $this->checkInDate->format( MPHB()->settings()->dateTime()->getDateFormat() ) : '',
+                'checkOutDate' => !is_null( $this->checkOutDate ) ? $this->checkOutDate->format( MPHB()->settings()->dateTime()->getDateFormat() ) : '',
+                'attributes'   => $this->attributes
+            ),
+            $instance,
+            $this
+        );
+
+        $templateAtts = array_merge( $templateArgs, array(
+            'action' => MPHB()->settings()->pages()->getSearchResultsPageUrl(),
+            'uniqid' => $this->uniqid,
+            'args'   => $templateArgs
+        ) );
 
 		mphb_get_template_part( 'widgets/search-availability/search-form', $templateAtts );
 	}
@@ -195,6 +209,8 @@ class SearchAvailabilityWidget extends BaseWidget {
 	 * @see \WP_Widget::form()
 	 *
 	 * @param array $instance Previously saved values from database.
+     *
+     * @since 3.8.1 added new action - "{$widget_id}_after_controls".
 	 */
 	public function form( $instance ){
 		$defaults = array(
@@ -244,6 +260,7 @@ class SearchAvailabilityWidget extends BaseWidget {
 			<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'attributes' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'attributes' ) ); ?>" type="text" value="<?php echo esc_attr( $attributes ); ?>">
 		</p>
 		<?php
+        do_action( "{$this->id_base}_after_controls", $instance, $this );
 	}
 
 	/**
@@ -255,6 +272,8 @@ class SearchAvailabilityWidget extends BaseWidget {
 	 * @param array $old_instance Previously saved values from database.
 	 *
 	 * @return array Updated safe values to be saved.
+     *
+     * @since 3.8.1 added new filter - "{$widget_id}_before_update".
 	 */
 	public function update( $new_instance, $old_instance ){
 		$instance = array(
@@ -293,6 +312,8 @@ class SearchAvailabilityWidget extends BaseWidget {
 		if ( isset( $new_instance['attributes'] ) && !empty( $new_instance['attributes'] ) ) {
 			$instance['attributes'] = $this->sanitizeText( $new_instance['attributes'] );
 		}
+
+        $instance = apply_filters( "{$this->id_base}_before_update", $instance, $new_instance, $old_instance, $this );
 
 		return $instance;
 	}

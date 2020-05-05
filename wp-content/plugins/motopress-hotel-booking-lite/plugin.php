@@ -106,6 +106,12 @@ class HotelBookingPlugin {
 	private $iCalMenuPage;
 
 
+    /**
+     * @var \MPHB\Admin\MenuPages\EditBookingMenuPage
+     * @since 3.8
+     */
+    private $editBookingMenuPage;
+
 	private $attributesMenuPage;
 
 	private $upgradeToPremiumMenuPage;
@@ -494,6 +500,8 @@ class HotelBookingPlugin {
 		$this->iCalMenuPage = new \MPHB\Admin\MenuPages\iCalMenuPage( 'mphb_ical', $iCalSettings );
 
 
+        $this->editBookingMenuPage = new \MPHB\Admin\MenuPages\EditBookingMenuPage( 'mphb_edit_booking', array( 'order' => 150, 'parent_menu' => 'none' ) );
+
 		$attributesSettings = array('order' => 9, 'parent_menu' => $this->postTypes()->roomType()->getMenuSlug());
 
 		$this->attributesMenuPage = new \MPHB\Admin\MenuPages\AttributesMenuPage('mphb_room_attribute', $attributesSettings);
@@ -872,6 +880,15 @@ class HotelBookingPlugin {
 		return $this->iCalMenuPage;
 	}
 
+
+    /**
+     * @return \MPHB\Admin\MenuPages\EditBookingMenuPage
+     *
+     * @since 3.8
+     */
+    public function getEditBookingMenuPage(){
+        return $this->editBookingMenuPage;
+    }
 
     /**
      * @return MPHB\Admin\MenuPages\ReportsMenuPage

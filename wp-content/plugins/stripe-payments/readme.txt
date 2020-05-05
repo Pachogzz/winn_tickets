@@ -5,7 +5,7 @@ Tags: stripe, stripe payments, stripe gateway, payment, payments, button, shortc
 Requires at least: 4.7
 Tested up to: 5.4
 Requires PHP: 5.6
-Stable tag: 2.0.23
+Stable tag: 2.0.28
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -153,6 +153,46 @@ Yes, please visit Stripe Payments > Settings screen for options.
 None.
 
 == Changelog ==
+
+= 2.0.28 =
+- Coupon code is now saved in Stripe metadata.
+- Restored `Don't Create Order` settings option (was hidden by mistake few versions back).
+- Attempt to fix `mixed content` browser error on payment popup when product thumbnail is using `http` instead of `https`.
+- Resolved issue with APM addon when shipping address collection is enabled.
+
+= 2.0.27 =
+- Added workaround for servers with aggressive caching when "Prefetch Payment Popup Scripts" option is enabled.
+- Removed dev debug lines from the code.
+- Fixed typos in text descriptions.
+
+= 2.0.26.1 =
+- Fixed a minor checkout issue with the Subscription addon when the `State` field is disabled.
+
+= 2.0.26 =
+- Added option to construct product price using variations only.
+- Added support for Lebanese Pound (LBP) and Saudi Riyal (SAR) currencies.
+- Added 'tax' parameter support for [asp_product] shortcode.
+- Added {coupon_code} email merge tag.
+- 'thankyou_page_url' parameter is no longer ignored by [asp_product] shortcode.
+- State value is now properly handled.
+- Shipping address is now properly saved if payment is made via payment addons.
+- Made prefetch work for products attached via CSS and link URL.
+- Upgraded Stripe PHP SDK to version 7.28.1.
+- PHP 7.4 support.
+- Minor improvements, bugfixes and optimizations.
+- Added built-in integration with [WP PDF Stamper plugin](https://www.tipsandtricks-hq.com/wp-pdf-stamper-plugin-2332)
+
+= 2.0.25 =
+- Added "State" field for billing and shipping address.
+- Added "Hide State Field" option to the settings menu. It's enabled by default for existing installations. This new option can be used to hide the field.
+- Bundled translation files are properly loaded now.
+- Minor improvements and optimizations.
+- Added Italian language translation file.
+
+= 2.0.24 =
+- Empty lines in billing and shipping address are no longer displayed.
+- Error is displayed when viewing subscription product with Subscriptions add-on disabled.
+- Added Japanese language translation file.
 
 = 2.0.23 =
 - Added "Last Name First" option for user name prefill. Useful for languages where last name comes first (Japanese).

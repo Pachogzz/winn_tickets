@@ -130,7 +130,7 @@ MPHBAdmin.CalendarPopup = can.Control.extend(
             this.loadBookingDetails(bookingId);
         },
 
-        '.mphb-close, .mphb-popup-backdrop click': function () {
+        '.mphb-close-popup-button, .mphb-popup-backdrop click': function () {
             this.hide();
         },
 
@@ -673,11 +673,150 @@ MPHBAdmin.Plugin = can.Construct.extend( {
                 case 'action-button':
                     ctrl = new MPHBAdmin.ActionButtonCtrl($(this));
                     break;
+                case 'install-plugin':
+                    ctrl = new MPHBAdmin.InstallButtonCtrl($(this));
+                    break;
 			}
 			$( this ).attr( 'data-inited', true );
 		} );
 	}
 } );
+
+/**
+ * @since 3.8
+ */
+MPHBAdmin.PopupForm = can.Control.extend(
+    {}, // Static
+    {
+        $popup: null,
+        $submitButton: null,
+
+        // States
+        isVisible: false,
+        isSubmitable: true, // Leave sentence "canSubmit" for the method
+
+        // Promise callbacks
+        resolve: null,
+        reject: null,
+
+        lastInput: {}, // Last input data from show()
+
+        init: function ($element, args) {
+            this.$popup = $element;
+            this.$submitButton = $element.find('.mphb-submit-popup-button');
+        },
+
+        /**
+         * @param {Object} inputData
+         *
+         * @private
+         */
+        reset: function (inputData) {
+            this.canSubmit(true);
+        },
+
+        /**
+         * @param {Object} data Optional.
+         * @returns {Promise}
+         *
+         * @public
+         */
+        show: function (data) {
+            if (this.isVisible) {
+                return;
+            }
+
+            this.lastInput = data || {};
+
+            // Make final preparations
+            this.reset(this.lastInput);
+
+            // Show popup
+            this.$popup.removeClass('mphb-hide');
+            this.isVisible = true;
+
+            // Create promise
+            var self = this;
+
+            return new Promise(function (resolve, reject) {
+                self.resolve = resolve;
+                self.reject = reject;
+            });
+        },
+
+        /**
+         * @private
+         */
+        close: function () {
+            if (!this.isVisible) {
+                return;
+            }
+
+            // Hide popup
+            this.$popup.addClass('mphb-hide');
+            this.isVisible = false;
+
+            // Reject the promise
+            this.reject(new Error('Closed.'));
+
+            this.resolve = this.reject = null;
+        },
+
+        /**
+         * @private
+         */
+        submit: function () {
+            if (!this.isVisible) {
+                return;
+            }
+
+            // Hide popup
+            this.$popup.addClass('mphb-hide');
+            this.isVisible = false;
+
+            // Fullfill the promise
+            if (this.canSubmit()) {
+                this.resolve(this.getData());
+            } else {
+                this.reject(new Error("Can't submit."));
+            }
+
+            this.resolve = this.reject = null;
+        },
+
+        /**
+         * @param {Boolean} isSubmitable Optional. New state to set.
+         * @returns {Boolean} The current state.
+         *
+         * @public
+         */
+        canSubmit: function (isSubmitable) {
+            if (isSubmitable != undefined) {
+                this.isSubmitable = isSubmitable;
+                this.$submitButton.prop('disabled', !this.isSubmitable);
+            }
+
+            return this.isSubmitable;
+        },
+
+        /**
+         * @returns {Object}
+         *
+         * @public
+         */
+        getData: function () {
+            return $.extend({}, this.lastInput);
+        },
+
+        ".mphb-submit-popup-button click": function (element, event) {
+            this.submit();
+        },
+
+        ".mphb-close-popup-button, .mphb-popup-backdrop click": function (element, event) {
+            this.close();
+        }
+    }
+);
 
 // table.wp-list-table
 MPHBAdmin.AttributesCustomOrder = can.Control.extend(
@@ -1649,6 +1788,153 @@ MPHBAdmin.GalleryCtrl = MPHBAdmin.Ctrl.extend( {}, {
 } );
 /**
  * @requires ./ctrl.js
+ *
+ * @since 3.8.1
+ */
+MPHBAdmin.InstallButtonCtrl = MPHBAdmin.Ctrl.extend(
+    {}, // Static
+    {
+        $button: null,
+        $preloader: null,
+        $statusText: null,
+
+        pluginSlug: '',
+        pluginZipLink: '#',
+
+        redirect: '',
+
+        ajax: {
+            url: '',
+            action: 'mphb_install_plugin',
+            nonce: ''
+        },
+
+        i18n: {
+            unknownError: ''
+        },
+
+        init: function ($element, args) {
+            this._super($element, args);
+
+            // Find elements
+            this.$button = $element.find('.button-row > button');
+            this.$preloader = $element.find('.mphb-preloader');
+            this.$statusText = $element.find('.status-text');
+
+            // Ger parameters
+            this.pluginSlug = this.$button.data('plugin-slug');
+            this.pluginZipLink = this.$button.data('plugin-zip');
+            this.redirect = this.$button.data('redirect');
+
+            if (this.redirect === 'no') {
+                this.redirect = false;
+            } else if (this.redirect == undefined) {
+                this.redirect = '';
+            }
+
+            // Other settings
+            var pluginData = MPHBAdmin.Plugin.myThis.data;
+            this.ajax.url = pluginData.ajaxUrl;
+            this.ajax.nonce = pluginData.nonces[this.ajax.action];
+            this.i18n.unknownError = pluginData.translations.errorHasOccured;
+
+            // Add listeners
+            this.$button.on('click', this.triggerInstall.bind(this));
+        },
+
+        triggerInstall: function (event) {
+            event.preventDefault(); // Don't accidently submit the form
+            this.beforeRequest(); // Reset classes and elements visibility
+
+            var self = this;
+
+            $.ajax({
+                url: this.ajax.url,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    action: this.ajax.action,
+                    mphb_nonce: this.ajax.nonce,
+                    plugin_slug: this.pluginSlug,
+                    plugin_zip: this.pluginZipLink
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Success
+                        self.afterSuccess();
+
+                        if (response.data && response.data.message) {
+                            self.setMessage(response.data.message);
+                        }
+
+                        self.reloadOrRedirect();
+
+                    } else {
+                        // Failure
+                        self.afterFailure();
+
+                        if (response.data && response.data.message) {
+                            self.setError(response.data.message);
+                        } else {
+                            self.setError(self.i18n.unknownError);
+                        }
+                    }
+                },
+                /**
+                 * @param {Object} jqXHR
+                 *
+                 * @todo Somehow recognize the success response.
+                 */
+                error: function (jqXHR) {
+                    // Here we got the logs like:
+                    //     ...
+                    //     <p>Unpacking the package...</p>
+                    //     <p>Installing the plugin...</p>
+                    //     <p>Plugin installed successfully.</p>
+                    self.afterSuccess();
+                    self.reloadOrRedirect();
+                }
+            });
+        },
+
+        beforeRequest: function () {
+            this.$button.prop('disabled', true);
+            this.$preloader.removeClass('mphb-hide');
+            this.$statusText.addClass('mphb-hide').removeClass('error').html('');
+        },
+
+        afterSuccess: function () {
+            this.$preloader.addClass('mphb-hide');
+        },
+
+        afterFailure: function () {
+            this.$button.prop('disabled', false);
+            this.$preloader.addClass('mphb-hide');
+        },
+
+        setMessage: function (message) {
+            this.$statusText.html(message).removeClass('error mphb-hide');
+        },
+
+        setError: function (message) {
+            this.$statusText.html(message).addClass('error').removeClass('mphb-hide');
+        },
+
+        reloadOrRedirect: function () {
+            // Reload current page or redirect to a new one
+            if (this.redirect !== false) {
+                if (this.redirect == '') {
+                    document.location.reload(true); // TRUE - load new page from server
+                } else {
+                    window.location.href = this.redirect;
+                }
+            }
+        }
+    }
+);
+
+/**
+ * @requires ./ctrl.js
  */
 MPHBAdmin.MultipleCheckboxCtrl = MPHBAdmin.Ctrl.extend( {
     renderValue: function( control ) {
@@ -2333,12 +2619,408 @@ MPHBAdmin.VariablePricingCtrl = MPHBAdmin.Ctrl.extend( {}, {
 	}
 } );
 
+/**
+ * @since 3.8
+ */
+MPHBAdmin.AddRoomPopup = MPHBAdmin.PopupForm.extend(
+    {}, // Static
+    {
+        $roomTypes: null,
+        $rooms: null,
+
+        availableRooms: {}, // {Room type ID: [Room IDs]}
+
+        reservedRooms: [],
+
+        selectedRoom: 0,
+        selectedRoomType: 0,
+
+        init: function ($element, args) {
+            this._super($element, args);
+
+            this.$roomTypes = $element.find('.mphb-room-type-select');
+            this.$rooms = $element.find('.mphb-room-select');
+
+            this.availableRooms = this.parseAvailableRooms(this.$rooms);
+        },
+
+        parseAvailableRooms: function ($select) {
+            var availableRooms = {};
+
+            $select.children().each(function (index, element) {
+                var roomId = parseInt(element.value);
+
+                if (!isNaN(roomId)) {
+                    var roomTypeId = parseInt(element.getAttribute('data-room-type-id'));
+
+                    if (!availableRooms[roomTypeId]) {
+                        availableRooms[roomTypeId] = [];
+                    }
+
+                    availableRooms[roomTypeId].push(roomId);
+                }
+            });
+
+            return availableRooms;
+        },
+
+        reset: function (inputData) {
+            this._super(inputData);
+
+            // Disable submit button
+            this.canSubmit(false);
+
+            this.reservedRooms = inputData.reserved_rooms;
+
+            // Get presets
+            var selectRoom = inputData.room_id || '';
+            var selectRoomType = inputData.room_type_id || '';
+
+            if (this.availableRooms.hasOwnProperty(selectRoomType)) {
+                var roomIndex = this.reservedRooms.indexOf(selectRoom);
+                if (roomIndex >= 0) {
+                    // Remove this room from reservedRooms and allow to use it
+                    // again as a replacement
+                    this.reservedRooms.splice(roomIndex, 1);
+                } else {
+                    selectRoom = '';
+                }
+            } else {
+                selectRoom = selectRoomType = '';
+            }
+
+            // Reset selects
+            this.$rooms.val(selectRoom);
+            this.$roomTypes.val(selectRoomType);
+
+            this.selectedRoom = selectRoom || 0;
+            this.selectedRoomType = selectRoomType || 0;
+
+            this.filterRoomTypes(); // Once on reset()
+            this.filterRooms();
+            this.checkIfCanSubmit();
+        },
+
+        filterRoomTypes: function () {
+            var $options = this.$roomTypes.children('[value!=""]');
+
+            var availableRooms = this.availableRooms;
+            var reservedRooms = this.reservedRooms;
+
+            $options.show();
+
+            $options.each(function (index, option) {
+                var roomTypeId = parseInt(option.value);
+                var roomsList = availableRooms[roomTypeId];
+                var freeCount = 0;
+
+                for (var i = 0; i < roomsList.length; i++) {
+                    if (reservedRooms.indexOf(roomsList[i]) == -1) {
+                        freeCount++;
+                    }
+                }
+
+                // Hide room type if no rooms left to select
+                if (freeCount == 0) {
+                    $(option).hide();
+
+                    // The room and the room type are not available for current dates
+                    if (roomTypeId == this.selectedRoomType) {
+                        this.selectedRoomType = this.selectedRoom = 0;
+                    }
+                }
+            });
+        },
+
+        filterRooms: function () {
+            var roomTypeId = this.selectedRoomType;
+            var $options = this.$rooms.children('[value!=""]');
+
+            if (roomTypeId != 0) {
+                $options.show();
+
+                // Leave only options of the current room type
+                var reservedRooms = this.reservedRooms;
+
+                $options.each(function (index, option) {
+                    var optionRoom = parseInt(option.value);
+                    var optionRoomType = parseInt(option.getAttribute('data-room-type-id'));
+
+                    if (optionRoomType != roomTypeId || reservedRooms.indexOf(optionRoom) >= 0) {
+                        $(option).hide();
+                    }
+                });
+
+            } else {
+                // Hide all room options (except for "- Select -")
+                $options.hide();
+            }
+        },
+
+        getData: function () {
+            var roomTypeId = this.selectedRoomType;
+            var roomTypeTitle = this.$roomTypes.children('option:selected').text().trim();
+
+            var roomId = this.selectedRoom;
+            var roomTitle = this.$rooms.children('option:selected').text().trim();
+
+            return $.extend({}, this._super(), {
+                room_type: {id: roomTypeId, title: roomTypeTitle},
+                room: {id: roomId, title: roomTitle}
+            });
+        },
+
+        checkIfCanSubmit: function () {
+            this.canSubmit(this.selectedRoom != 0 && this.selectedRoomType != 0);
+        },
+
+        ".mphb-room-type-select change": function (element, event) {
+            var selectedRoomType = parseInt(this.$roomTypes.val()) || 0;
+            var roomTypeChanged = (this.selectedRoomType != selectedRoomType);
+
+            this.selectedRoomType = selectedRoomType;
+
+            // Reset the selected room if we changed the room type
+            if (roomTypeChanged) {
+                this.$rooms.val('');
+                this.selectedRoom = 0;
+
+                this.filterRooms();
+                this.checkIfCanSubmit();
+            }
+        },
+
+        ".mphb-room-select change": function (element, event) {
+            this.selectedRoom = parseInt(this.$rooms.val()) || 0;
+
+            this.checkIfCanSubmit();
+        }
+    }
+);
+/**
+ * @since 3.8
+ */
+MPHBAdmin.BookingEditor = can.Control.extend(
+    {}, // Static
+    {
+        $editor: null,
+        $roomsTable: null, // .mphb-reserve-rooms-table > tbody (wrapper of the <tr>s)
+        $submitButton: null, // .mphb-reserve-rooms .mphb-submit-button-wrapper > .button
+
+        settings: {}, // MPHBAdmin.Plugin.myThis.data.settings
+        i18n: {}, // MPHBAdmin.Plugin.myThis.data.translations
+
+        rooms: {}, // {Room ID: {isAvailable, $element: Room jQuery element}}
+
+        popup: null,
+
+        init: function ($element, args) {
+            this.$editor = $element;
+            this.$roomsTable = $element.find('.mphb-reserve-rooms-table > tbody');
+            this.$submitButton = $element.find('.mphb-reserve-rooms .mphb-submit-button-wrapper > .button');
+
+            this.settings = MPHBAdmin.Plugin.myThis.data.settings;
+            this.i18n = MPHBAdmin.Plugin.myThis.data.translations;
+
+            this.popup = new MPHBAdmin.AddRoomPopup($element.find('.mphb-popup'));
+
+            this.initDatepickers();
+            this.initRooms();
+
+            this.toggleSubmit();
+        },
+
+        initDatepickers: function () {
+            this.$editor.find('.mphb-datepick').datepick({
+                dateFormat: this.settings.dateFormat,
+                firstDay: this.settings.firstDay,
+                showSpeed: 0,
+                showOtherMonths: true,
+                monthsToShow: this.settings.numberOfMonthDatepicker,
+                pickerClass: this.settings.datepickerClass + ' mphb-datepick-popup mphb-check-in-datepick',
+                useMouseWheel: false
+            });
+        },
+
+        initRooms: function () {
+            var $rooms = this.$roomsTable.children();
+            var self = this;
+
+            $rooms.each(function (index, node) {
+                var $room = $(node);
+                var roomId = parseInt($room.data('room-id'));
+                var roomTypeId = parseInt($room.data('room-type-id'));
+
+                if (!isNaN(roomId) && !isNaN(roomTypeId)) {
+                    self.rooms[roomId] = {
+                        $element:    $room,
+                        roomTypeId:  roomTypeId,
+                        isAvailable: $room.hasClass('mphb-available-room')
+                    };
+                }
+            });
+        },
+
+        toggleSubmit: function () {
+            if (!this.hasRooms() || this.hasUnavailableRooms()) {
+                this.$submitButton.prop('disabled', true);
+            } else {
+                this.$submitButton.prop('disabled', false);
+            }
+        },
+
+        hasRooms: function () {
+            return !$.isEmptyObject(this.rooms);
+        },
+
+        hasUnavailableRooms: function () {
+            var hasUnavailable = false;
+
+            $.each(this.rooms, function (index, room) {
+                if (!room.isAvailable) {
+                    hasUnavailable = true;
+                    return false;
+                }
+            });
+
+            return hasUnavailable;
+        },
+
+        addRoom: function (room, roomType) {
+            var row = '<tr class="mphb-reserve-room mphb-available-room" data-room-id="' + room.id + '">'
+                + '<td class="column-room-type">' + roomType.title + '</td>'
+                + '<td class="column-room">' + room.title + '</td>'
+                + '<td class="column-status">'
+                    + '<input type="hidden" name="add_rooms[]" value="' + room.id + '">'
+                    + '<span>' + this.i18n.available + '</span>'
+                + '</td>'
+                + '<td class="column-actions">'
+                    + '<button class="button mphb-remove-room-button">' + this.i18n.remove + '</button>'
+                    + ' <button class="button mphb-replace-room-button">' + this.i18n.replace + '</button>'
+                + '</td>'
+                + '</tr>';
+
+            this.$roomsTable.append(row);
+
+            this.rooms[room.id] = {
+                $element:    this.$roomsTable.children('[data-room-id="' + room.id + '"]').first(),
+                roomTypeId:  roomType.id,
+                isAvailable: true
+            };
+
+            this.toggleSubmit();
+        },
+
+        replaceRoom: function (replaceId, room, roomType) {
+            if (!this.rooms[replaceId]) {
+                return;
+            }
+
+            var $roomElement = this.rooms[replaceId]['$element'];
+            var $statusColumn = $roomElement.children('.column-status');
+            var $statusInput = $statusColumn.children('input').first();
+
+            // Update titles
+            $roomElement.children('.column-room-type').text(roomType.title);
+            $roomElement.children('.column-room').text(room.title);
+
+            // Updat inputs
+            $roomElement.data('room-id', room.id);
+
+            if ($statusInput.length == 1) {
+                $statusInput.val(room.id)
+            } else {
+                $roomElement.children('.column-status').prepend('<input type="hidden" name="replace_rooms[' + replaceId + ']" value="' + room.id + '">');
+            }
+
+            // Update status text
+            $statusColumn.children('span').text(this.i18n.available);
+            $roomElement.removeClass('mphb-unavailable-room').addClass('mphb-available-room');
+
+            this.rooms[room.id] = this.rooms[replaceId];
+            this.rooms[room.id]['roomTypeId'] = roomType.id;
+            this.rooms[room.id]['isAvailable'] = true;
+
+            delete(this.rooms[replaceId]);
+
+            // Enable submit button if all rooms are available
+            this.toggleSubmit();
+        },
+
+        getRoomIds: function () {
+            return Object.keys(this.rooms).map(function (roomId) { return parseInt(roomId); });
+        },
+
+        "#mphb-add-room-button click": function (element, event) {
+            event.preventDefault();
+
+            var self = this;
+
+            this.popup.show({reserved_rooms: this.getRoomIds()}).then(
+                function (data) {
+                    self.addRoom(data.room, data.room_type);
+                },
+                function (error) {} // Catch errors. Don't trigger "Uncaught error"
+            );
+        },
+
+        ".mphb-replace-room-button click": function (element, event) {
+            event.preventDefault();
+
+            var $room = element.parents('.mphb-reserve-room');
+            var roomId = parseInt($room.data('room-id'));
+            var self = this;
+
+            if (!isNaN(roomId)) {
+                var popupData = {
+                    reserved_rooms: this.getRoomIds(),
+                    room_id:        roomId,
+                    room_type_id:   this.rooms[roomId]['roomTypeId']
+                };
+
+                this.popup.show(popupData).then(
+                    function (data) {
+                        self.replaceRoom(data.room_id, data.room, data.room_type);
+                    },
+                    function (error) {} // Catch errors. Don't trigger "Uncaught error"
+                );
+            }
+        },
+
+        ".mphb-remove-room-button click": function (element, event) {
+            event.preventDefault();
+
+            var $room = element.parents('.mphb-reserve-room');
+            var roomId = parseInt($room.data('room-id'));
+
+            if (!isNaN(roomId) && this.rooms[roomId] != undefined) {
+                delete(this.rooms[roomId]);
+            }
+
+            $room.remove();
+
+            this.toggleSubmit();
+        },
+
+        ".mphb-reserve-rooms .mphb-submit-button-wrapper > .button click": function (element, event) {
+            if (!this.hasRooms() || this.hasUnavailableRooms()) {
+                // Don't go to the next step
+                event.preventDefault();
+            }
+        }
+    }
+);
+
 	new MPHBAdmin.Plugin();
 
 	$( function() {
 		if ( $( '.mphb-bookings-calendar-wrapper' ) ) {
 			new MPHBAdmin.BookingsCalendar( $( '.mphb-bookings-calendar-wrapper' ) );
 		}
+
+        if ( $('.mphb-edit-booking.edit' ).length > 0 ) {
+            new MPHBAdmin.BookingEditor( $( '.mphb-edit-booking' ) );
+        }
 
 		if ( MPHBAdmin.Plugin.myThis.data.settings.isAttributesCustomOrder ) {
 			new MPHBAdmin.AttributesCustomOrder( $( 'table.wp-list-table' ) );

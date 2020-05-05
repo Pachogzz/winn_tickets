@@ -56,6 +56,17 @@ class BookingCPT extends EditableCPT {
 			),
 		);
 
+        $bookingId = mphb_get_editing_post_id();
+        $booking = $bookingId > 0 ? mphb_get_booking($bookingId) : null;
+
+        if (!is_null($booking) && !$booking->isImported()) {
+            $mainGroupFields[] = Fields\FieldFactory::create( 'mphb_edit_dates', array(
+                'type'        => 'link-button',
+                'inner_label' => __( 'Edit Dates', 'motopress-hotel-booking' ),
+                'href'        => MPHB()->getEditBookingMenuPage()->getUrl( array( 'booking_id' => $bookingId ) )
+            ) );
+        }
+
 		$mainGroup->addFields( $mainGroupFields );
 
 		$customerGroup = new Groups\MetaBoxGroup( 'mphb_customer', __( 'Customer Information', 'motopress-hotel-booking' ), $this->postType );

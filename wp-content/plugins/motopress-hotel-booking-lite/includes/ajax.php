@@ -4,6 +4,7 @@ namespace MPHB;
 
 use \MPHB\Entities;
 use \MPHB\Views;
+use \MPHB\Utils\ThirdPartyPluginsUtils;
 
 /**
  * @todo move each ajax controller to separate class
@@ -18,6 +19,10 @@ class Ajax {
 	protected $actionPrefix	 = 'mphb_';
 	protected $ajaxActions	 = array(
 		// Admin
+        'install_plugin' => array(
+            'method' => 'POST',
+            'nopriv' => false
+        ),
         'display_imported_bookings'  => array(
             'method' => 'POST',
             'nopriv' => false
@@ -171,6 +176,38 @@ class Ajax {
 		return $nonces;
 	}
 
+
+    /**
+     * @since 3.8.1
+     */
+    public function install_plugin()
+    {
+        $this->verifyNonce(__FUNCTION__);
+
+        $input = $this->retrieveInput(__FUNCTION__);
+
+        if (!isset($input['plugin_slug'], $input['plugin_zip'])) {
+            wp_send_json_error(array('message' => __('No enough data', 'motopress-hotel-booking')));
+        }
+
+        $pluginSlug = sanitize_text_field($input['plugin_slug']);
+        $pluginZip = sanitize_text_field($input['plugin_zip']);
+
+        $installed = ThirdPartyPluginsUtils::isPluginInstalled($pluginSlug);
+
+        if (!$installed) {
+            $installed = ThirdPartyPluginsUtils::installPlugin($pluginZip);
+        }
+
+        $activated = ThirdPartyPluginsUtils::isPluginActive($pluginSlug)
+            || ($installed && ThirdPartyPluginsUtils::activatePlugin($pluginSlug));
+
+        if ($installed && $activated) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error(array('message' => __('An error has occurred', 'motopress-hotel-booking'))); // Very informative
+        }
+    }
 
     public function display_imported_bookings()
     {

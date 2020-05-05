@@ -56,6 +56,13 @@ class BlocksRender
         return $this->renderShortcode(MPHB()->getShortcodes()->getBookingConfirmation(), $atts);
     }
 
+    /**
+     * @param \MPHB\Shortcodes\AbstractShortcode $shortcode
+     * @param array $atts
+     * @return string
+     *
+     * @since 3.8.1 added new filter: "mphb_render_block_attributes".
+     */
     protected function renderShortcode($shortcode, $atts)
     {
         $atts = $this->filterAtts($atts);
@@ -63,6 +70,8 @@ class BlocksRender
         if ($this->isAdminRequest()) {
             $atts = $this->adminAtts($atts, $shortcode->getName());
         }
+
+        $atts = apply_filters('mphb_render_block_attributes', $atts, $shortcode->getName());
 
         mphb_fix_blocks_autop();
 

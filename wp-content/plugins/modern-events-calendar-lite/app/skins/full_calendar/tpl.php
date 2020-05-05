@@ -30,14 +30,13 @@ if($this->main->is_ajax()) echo $javascript;
 else $this->factory->params('footer', $javascript);
 
 $styling = $this->main->get_styling();
-
 $event_colorskin = (isset($styling['mec_colorskin'] ) || isset($styling['color'])) ? 'colorskin-custom' : '';
-$dark_mode = ( isset($styling['dark_mode']) ) ? $styling['dark_mode'] : '';
-if ( $dark_mode == 1 ): $set_dark = 'mec-dark-mode';
-else: $set_dark ='';
-endif;
 
-do_action('mec_start_skin' , $this->id);
+$dark_mode = isset($styling['dark_mode']) ? $styling['dark_mode'] : '';
+if($dark_mode == 1) $set_dark = 'mec-dark-mode';
+else $set_dark = '';
+
+do_action('mec_start_skin', $this->id);
 do_action('mec_full_skin_head');
 ?>
 <div id="mec_skin_<?php echo $this->id; ?>" class="mec-wrap <?php echo $event_colorskin . ' ' . $set_dark; ?> mec-full-calendar-wrap">
@@ -68,14 +67,11 @@ do_action('mec_full_skin_head');
 
                 // Status of Speakers Feature
                 $speakers_status = (!isset($this->settings['speakers_status']) or (isset($this->settings['speakers_status']) and !$this->settings['speakers_status'])) ? false : true;
-                $sf_columns = 8;
+                $sf_columns = 7;
             ?>
         <?php
-            if ( (!empty($sf_category) && $sf_category["type"] == 'dropdown') || (!empty($sf_location) && $sf_location["type"] == 'dropdown') || (!empty($sf_organizer) && $sf_organizer["type"] == 'dropdown') || (!empty($sf_speaker) && $sf_speaker["type"] == 'dropdown') || (!empty($sf_tag) && $sf_tag["type"] == 'dropdown') || (!empty($sf_label) && $sf_label["type"] == 'dropdown') ):
-                $wrapper_class = 'class="mec-dropdown-wrap"';
-            else:
-                $wrapper_class = '';
-            endif;
+            if((!empty($sf_category) && $sf_category["type"] == 'dropdown') || (!empty($sf_location) && $sf_location["type"] == 'dropdown') || (!empty($sf_organizer) && $sf_organizer["type"] == 'dropdown') || (!empty($sf_speaker) && $sf_speaker["type"] == 'dropdown') || (!empty($sf_tag) && $sf_tag["type"] == 'dropdown') || (!empty($sf_label) && $sf_label["type"] == 'dropdown')) $wrapper_class = 'class="mec-dropdown-wrap"';
+            else $wrapper_class = '';
         ?>
         <div id="mec_search_form_<?php echo $this->id; ?>" <?php echo $wrapper_class; ?>>
             <?php if($sf_category_status): ?>
@@ -117,13 +113,15 @@ do_action('mec_full_skin_head');
             </div>        
         <?php endif; ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <div class="mec-totalcal-view">
                 <?php if($this->yearly): ?><span class="mec-totalcal-yearlyview<?php if($this->default_view == 'yearly') echo ' mec-totalcalview-selected'; ?>" data-skin="yearly"><?php _e('Yearly', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
                 <?php if($this->monthly): ?><span class="mec-totalcal-monthlyview<?php if($this->default_view == 'monthly') echo ' mec-totalcalview-selected'; ?>" data-skin="monthly"><?php _e('Monthly', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
                 <?php if($this->weekly): ?><span class="mec-totalcal-weeklyview<?php if($this->default_view == 'weekly') echo ' mec-totalcalview-selected'; ?>" data-skin="weekly"><?php _e('Weekly', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
                 <?php if($this->daily): ?><span class="mec-totalcal-dailyview<?php if($this->default_view == 'daily') echo ' mec-totalcalview-selected'; ?>" data-skin="daily"><?php _e('Daily', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
                 <?php if($this->list): ?><span class="mec-totalcal-listview<?php if($this->default_view == 'list') echo ' mec-totalcalview-selected'; ?>" data-skin="list"><?php _e('List', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
+                <?php if($this->grid): ?><span class="mec-totalcal-gridview<?php if($this->default_view == 'grid') echo ' mec-totalcalview-selected'; ?>" data-skin="grid"><?php _e('Grid', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
+                <?php if($this->tile): ?><span class="mec-totalcal-tileview<?php if($this->default_view == 'tile') echo ' mec-totalcalview-selected'; ?>" data-skin="tile"><?php _e('Tile', 'modern-events-calendar-lite'); ?></span><?php endif; ?>
             </div>
         </div>
     </div>

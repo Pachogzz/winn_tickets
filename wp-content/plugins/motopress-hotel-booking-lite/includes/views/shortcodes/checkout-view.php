@@ -128,23 +128,24 @@ class CheckoutView {
      * @param \MPHB\Entities\RoomType $roomType
      * @param \MPHB\Entities\Booking $booking
      *
-     * @since 3.7.0 added parameter $reservedRoom.
-     * @since 3.7.0 parameter $roomType became third.
-     * @since 3.7.0 added new filter - "mphb_sc_checkout_preset_adults".
-     * @since 3.7.0 added new filter - "mphb_sc_checkout_preset_children".
+     * @since 3.7 added parameter $reservedRoom (become first).
+     * @since 3.7 parameters changed their positions: {$roomType, $roomIndex, $booking} to {$reservedRoom, $roomIndex, $roomType, $booking}.
+     * @since 3.7 added new filters: "mphb_sc_checkout_preset_adults" and "mphb_sc_checkout_preset_children".
+     * @since 3.8 added new filter - "mphb_sc_checkout_preset_guest_name".
      */
     public static function renderGuestsChooser($reservedRoom, $roomIndex, $roomType, $booking)
     {
         $namePrefix = 'mphb_room_details[' . esc_attr($roomIndex) . ']';
-        $idPrefix   = 'mphb_room_details-' . esc_attr($roomIndex);
+        $idPrefix = 'mphb_room_details-' . esc_attr($roomIndex);
 
+        // Value -1 means that nothing is selected ("— Select —" option active)
         $adultsCapacity = $roomType->getAdultsCapacity();
-        $minAdults = MPHB()->settings()->main()->getMinAdults();
+        $minAdults = mphb_get_min_adults();
         $maxAdults = $adultsCapacity;
         $presetAdults = apply_filters('mphb_sc_checkout_preset_adults', -1, $roomType, $reservedRoom, $booking);
 
         $childrenCapacity = $roomType->getChildrenCapacity();
-        $minChildren = MPHB()->settings()->main()->getMinChildren();
+        $minChildren = mphb_get_min_children();
         $maxChildren = $childrenCapacity;
         $presetChildren = apply_filters('mphb_sc_checkout_preset_children', -1, $roomType, $reservedRoom, $booking);
 
@@ -155,9 +156,9 @@ class CheckoutView {
             $maxChildren = max($minChildren, min($childrenCapacity, $totalCapacity));
 
             if ($presetAdults + $presetChildren > $totalCapacity) {
-                // Someone misused the filters. Reset defaults. -1 = nothing selected
-                // (can't use 0 - 0-value exists in the children's option list)
-                $presetAdults = $presetChildren = -1; // "— Select —" active
+                // Someone misused the filters? Reset values
+                $presetAdults = $maxAdults;
+                $presetChildren = -1;
             }
         } else {
             $totalCapacity = $roomType->calcTotalCapacity();
@@ -165,20 +166,22 @@ class CheckoutView {
 
         $childrenAllowed = $maxChildren > 0 && MPHB()->settings()->main()->isChildrenAllowed();
 
+        $presetGuestName = apply_filters('mphb_sc_checkout_preset_guest_name', '', $reservedRoom, $booking);
+
         ?>
         <?php if (MPHB()->settings()->main()->isAdultsAllowed()) { ?>
             <p class="mphb-adults-chooser">
-                <label for="<?php echo esc_attr($idPrefix . '-adults'); ?>">
+                <label for="<?php echo esc_attr($idPrefix); ?>-adults">
                     <?php
-                        if (MPHB()->settings()->main()->isChildrenAllowed()) {
-                            _e('Adults', 'motopress-hotel-booking');
-                        } else {
-                            _e('Guests', 'motopress-hotel-booking');
-                        }
+                    if (MPHB()->settings()->main()->isChildrenAllowed()) {
+                        _e('Adults', 'motopress-hotel-booking');
+                    } else {
+                        _e('Guests', 'motopress-hotel-booking');
+                    }
                     ?>
                     <abbr title="<?php _e('Required', 'motopress-hotel-booking'); ?>">*</abbr>
                 </label>
-                <select name="<?php echo esc_attr($namePrefix . '[adults]'); ?>" id="<?php echo esc_attr($idPrefix . '-adults'); ?>" class="mphb_sc_checkout-guests-chooser mphb_checkout-guests-chooser" required="required" data-max-allowed="<?php echo esc_attr($adultsCapacity); ?>" data-max-total="<?php echo esc_attr($totalCapacity); ?>">
+                <select name="<?php echo esc_attr($namePrefix); ?>[adults]" id="<?php echo esc_attr($idPrefix); ?>-adults" class="mphb_sc_checkout-guests-chooser mphb_checkout-guests-chooser" required="required" data-max-allowed="<?php echo esc_attr($adultsCapacity); ?>" data-max-total="<?php echo esc_attr($totalCapacity); ?>">
                     <option value=""><?php _e('— Select —', 'motopress-hotel-booking'); ?></option>
                     <?php for ($i = 1; $i <= $maxAdults; $i++) { ?>
                         <option value="<?php echo $i; ?>" <?php selected($i, $presetAdults); ?>>
@@ -188,16 +191,16 @@ class CheckoutView {
                 </select>
             </p>
         <?php } else { ?>
-            <input type="hidden" id="<?php echo esc_attr($idPrefix . '-adults'); ?>" name="<?php echo esc_attr($namePrefix . '[adults]'); ?>" value="<?php echo esc_attr($minAdults); ?>" />
+            <input type="hidden" id="<?php echo esc_attr($idPrefix); ?>-adults" name="<?php echo esc_attr($namePrefix); ?>[adults]" value="<?php echo esc_attr($minAdults); ?>">
         <?php } ?>
 
         <?php if ($childrenAllowed) { ?>
             <p class="mphb-children-chooser">
-                <label for="<?php echo esc_attr($idPrefix . '-children'); ?>">
+                <label for="<?php echo esc_attr($idPrefix); ?>-children">
                     <?php printf(__('Children %s', 'motopress-hotel-booking'), MPHB()->settings()->main()->getChildrenAgeText()); ?>
                     <abbr title="<?php _e('Required', 'motopress-hotel-booking'); ?>">*</abbr>
                 </label>
-                <select name="<?php echo esc_attr($namePrefix . '[children]'); ?>" id="<?php echo esc_attr($idPrefix . '-children'); ?>" class="mphb_sc_checkout-guests-chooser mphb_checkout-guests-chooser" required="required" data-max-allowed="<?php echo esc_attr($childrenCapacity); ?>" data-max-total="<?php echo esc_attr($totalCapacity); ?>">
+                <select name="<?php echo esc_attr($namePrefix); ?>[children]" id="<?php echo esc_attr($idPrefix); ?>-children" class="mphb_sc_checkout-guests-chooser mphb_checkout-guests-chooser" required="required" data-max-allowed="<?php echo esc_attr($childrenCapacity); ?>" data-max-total="<?php echo esc_attr($totalCapacity); ?>">
                     <option value=""><?php _e('— Select —', 'motopress-hotel-booking'); ?></option>
                     <?php for ($i = 0; $i <= $maxChildren; $i++) { ?>
                         <option value="<?php echo $i; ?>" <?php selected($i, $presetChildren); ?>>
@@ -207,152 +210,149 @@ class CheckoutView {
                 </select>
             </p>
         <?php } else { ?>
-            <input type="hidden" id="<?php echo esc_attr($idPrefix . '-children'); ?>" name="<?php echo esc_attr($namePrefix . '[children]'); ?>" value="<?php echo esc_attr($minChildren); ?>" />
+            <input type="hidden" id="<?php echo esc_attr($idPrefix); ?>-children" name="<?php echo esc_attr($namePrefix); ?>[children]" value="<?php echo esc_attr($minChildren); ?>">
         <?php } ?>
 
         <p class="mphb-guest-name-wrapper">
-            <label for="<?php echo esc_attr($idPrefix . '-guest-name'); ?>">
+            <label for="<?php echo esc_attr($idPrefix); ?>-guest-name">
                 <?php _e('Full Guest Name', 'motopress-hotel-booking'); ?>
             </label>
-            <input type="text" name="<?php echo esc_attr($namePrefix . '[guest_name]'); ?>" id="<?php echo esc_attr($idPrefix . '-guest-name'); ?>" />
+            <input type="text" name="<?php echo esc_attr($namePrefix); ?>[guest_name]" id="<?php echo esc_attr($idPrefix); ?>-guest-name" value="<?php echo esc_attr($presetGuestName); ?>">
         </p>
         <?php
     }
 
-	/**
+    /**
 	 * @param \MPHB\Entities\ReservedRoom $reservedRoom
 	 * @param \MPHB\Entities\RoomType $roomType
 	 * @param int $roomIndex
-	 * @param \MPHB\Entities\Booking $booking
+     * @param \MPHB\Entities\Booking $booking
 	 * @param array $roomDetails
      *
-     * @since 3.7.0 added parameter $reservedRoom.
-     * @since 3.7.0 parameter $roomType became third.
-	 */
-	public static function renderRateChooser( $reservedRoom, $roomIndex, $roomType, $booking, $roomDetails ){
-		$idPrefix	 = 'mphb_room_details-' . esc_attr( $roomIndex );
-		$namePrefix	 = 'mphb_room_details[' . esc_attr( $roomIndex ) . ']';
+     * @since 3.7 parameters changed their positions: {$roomType, $roomIndex, $booking, $roomDetails} to {$reservedRoom, $roomIndex, $roomType, $booking, $roomDetails}.
+     * @since 3.8 added new filter - "mphb_sc_checkout_preset_rate_id".
+     */
+    public static function renderRateChooser($reservedRoom, $roomIndex, $roomType, $booking, $roomDetails)
+    {
+        $namePrefix = 'mphb_room_details[' . esc_attr($roomIndex) . ']';
+        $idPrefix = 'mphb_room_details-' . esc_attr($roomIndex);
 
-		$allowedRates	 = $roomDetails[$roomIndex]['allowed_rates'];
-		$adults			 = $roomDetails[$roomIndex]['adults'];
-		$children		 = $roomDetails[$roomIndex]['children'];
+		$allowedRates   = $roomDetails[$roomIndex]['allowed_rates'];
+        $defaultRate    = reset($allowedRates);
+        $selectedRateId = $defaultRate->getOriginalId();
+		$adults         = $roomDetails[$roomIndex]['adults'];
+		$children       = $roomDetails[$roomIndex]['children'];
 
-		if ( count( $allowedRates ) > 1 ) :
-			?>
-			<section class="mphb-rate-chooser mphb-checkout-item-section">
-				<h4 class="mphb-room-rate-chooser-title">
-					<?php _e( 'Choose Rate', 'motopress-hotel-booking' ); ?>
-				</h4>
-				<?php
-				$isFirst = true;
-				foreach ( $allowedRates as $rate ) {
-					$rate = apply_filters( '_mphb_translate_rate', $rate );
-					MPHB()->reservationRequest()->setupParameters( array(
-						'adults'		 => $adults,
-						'children'		 => $children,
-						'check_in_date'	 => $booking->getCheckInDate(),
-						'check_out_date' => $booking->getCheckOutDate()
-					) );
-					$ratePrice = mphb_format_price( $rate->calcPrice( $booking->getCheckInDate(), $booking->getCheckOutDate() ) );
-					?>
+        if (count($allowedRates) > 1) {
+            $selectedRateId = apply_filters('mphb_sc_checkout_preset_rate_id', $selectedRateId, $reservedRoom, $booking, $allowedRates);
 
-					<p class="mphb-room-rate-variant">
-						<label for="<?php echo $idPrefix . '-rate-id-' . $rate->getOriginalId(); ?>">
-							<input
-								type="radio"
-								name="<?php echo $namePrefix . '[rate_id]'; ?>"
-								id="<?php echo $idPrefix . '-rate-id-' . $rate->getOriginalId(); ?>"
-								class="mphb_sc_checkout-rate mphb_checkout-rate mphb-radio-label"
-								value="<?php echo $rate->getOriginalId(); ?>" <?php checked( $isFirst ) ?>
-								/>
-							<strong>
-								<?php echo esc_html( $rate->getTitle() ) . ', ' . $ratePrice; ?>
-							</strong>
-						</label>
-						<br />
-						<?php echo esc_html( $rate->getDescription() ); ?>
-					</p>
-					<?php $isFirst	 = false; ?>
-				<?php } ?>
-			</section>
-		<?php else : ?>
-			<?php $defaultRate = reset( $allowedRates ); ?>
-			<input type="hidden" name="<?php echo $namePrefix ?>[rate_id]" value="<?php echo esc_attr( $defaultRate->getOriginalId() ); ?>" />
-		<?php
-		endif;
-	}
+            ?>
+            <section class="mphb-rate-chooser mphb-checkout-item-section">
+                <h4 class="mphb-room-rate-chooser-title">
+                    <?php _e('Choose Rate', 'motopress-hotel-booking'); ?>
+                </h4>
 
-	/**
+                <?php
+                foreach ($allowedRates as $rate) {
+                    $rate = apply_filters('_mphb_translate_rate', $rate);
+                    $rateId = $rate->getOriginalId();
+
+                    MPHB()->reservationRequest()->setupParameters(array(
+                        'adults'         => $adults,
+                        'children'       => $children,
+                        'check_in_date'  => $booking->getCheckInDate(),
+                        'check_out_date' => $booking->getCheckOutDate()
+                    ));
+
+                    $ratePrice = mphb_format_price($rate->calcPrice($booking->getCheckInDate(), $booking->getCheckOutDate()));
+
+                    $inputId = $idPrefix . '-rate-id-' . $rateId;
+                    $inputName = $namePrefix . '[rate_id]';
+
+                    ?>
+                    <p class="mphb-room-rate-variant">
+                        <label for="<?php echo esc_attr($inputId); ?>">
+                            <input type="radio" id="<?php echo esc_attr($inputId); ?>" name="<?php echo esc_attr($inputName); ?>" class="mphb_sc_checkout-rate mphb_checkout-rate mphb-radio-label" value="<?php echo esc_attr($rateId); ?>" <?php checked($selectedRateId, $rateId); ?>>
+                            <strong>
+                                <?php echo esc_html($rate->getTitle()) . ', ' . $ratePrice; ?>
+                            </strong>
+                        </label>
+                        <br>
+                        <?php echo esc_html($rate->getDescription()); ?>
+                    </p>
+                <?php } // For each allowed rate ?>
+            </section>
+        <?php } else { ?>
+            <input type="hidden" name="<?php echo esc_attr($namePrefix); ?>[rate_id]" value="<?php echo esc_attr($selectedRateId); ?>">
+        <?php }
+    }
+
+    /**
 	 * @param \MPHB\Entities\ReservedRoom $reservedRoom
      * @param int $roomIndex
 	 * @param \MPHB\Entities\RoomType $roomType
-	 * @param \MPHB\Entities\Booking $booking
+     * @param \MPHB\Entities\Booking $booking
      *
-     * @since 3.7.0 added parameter $reservedRoom.
-     * @since 3.7.0 parameter $roomType became third.
-     * @since 3.7.0 added new filter - "mphb_sc_checkout_is_selected_service".
-	 */
-	public static function renderServiceChooser( $reservedRoom, $roomIndex, $roomType, $booking ){
+     * @since 3.7 parameters changed their positions: {$roomType, $roomIndex, $booking} to {$reservedRoom, $roomIndex, $roomType, $booking}.
+     * @since 3.7 added new filter - "mphb_sc_checkout_is_selected_service".
+     * @since 3.8 added new filters: "mphb_sc_checkout_preset_service_adults" and "mphb_sc_checkout_preset_service_quantity".
+     */
+    public static function renderServiceChooser($reservedRoom, $roomIndex, $roomType, $booking)
+    {
+        if (!$roomType->hasServices()) {
+            return;
+        }
 
-		if ( !$roomType->hasServices() ) {
-			return;
-		}
+        $services = MPHB()->getServiceRepository()->findAll(array(
+            'post__in'         => $roomType->getServices(),
+            'suppress_filters' => true
+        ));
 
-		$servicesAtts = array(
-			'post__in' => $roomType->getServices()
-		);
-
-		$services = MPHB()->getServiceRepository()->findAll( $servicesAtts );
-
-        if ( empty( $services ) ) {
+        if (empty($services)) {
             return; // MB-858 - don't show "Choose Additional Services" when there are no available services
         }
 
-		?>
-		<section id="mphb-services-details-<?php echo $roomIndex; ?>" class="mphb-services-details mphb-checkout-item-section">
-			<h4 class="mphb-services-details-title">
-				<?php _e( 'Choose Additional Services', 'motopress-hotel-booking' ); ?>
-			</h4>
-			<ul class="mphb_sc_checkout-services-list mphb_checkout-services-list">
+        ?>
+        <section id="mphb-services-details-<?php echo esc_attr($roomIndex); ?>" class="mphb-services-details mphb-checkout-item-section">
+            <h4 class="mphb-services-details-title">
+                <?php _e('Choose Additional Services', 'motopress-hotel-booking'); ?>
+            </h4>
 
-				<?php foreach ( $services as $index => $service ) { ?>
-					<?php
-					$namePrefix = 'mphb_room_details[' . esc_attr( $roomIndex ) . '][services][' . esc_attr( $index ) . ']';
-					$idPrefix   = 'mphb_room_details-' . esc_attr( $roomIndex ) . '-service-' . $service->getOriginalId();
+            <ul class="mphb_sc_checkout-services-list mphb_checkout-services-list">
+                <?php foreach ($services as $index => $service) {
+                    $serviceId = $service->getOriginalId();
+                    $presetAdults = apply_filters('mphb_sc_checkout_preset_service_adults', $roomType->getAdultsCapacity(), $service, $reservedRoom, $roomType);
 
-                    $service = apply_filters( '_mphb_translate_service', $service );
+                    $namePrefix = 'mphb_room_details[' . esc_attr($roomIndex) . '][services][' . esc_attr($index) . ']';
+                    $idPrefix = 'mphb_room_details-' . esc_attr($roomIndex) . '-service-' . $serviceId;
 
+                    $service = apply_filters('_mphb_translate_service', $service);
                     $isSelected = apply_filters('mphb_sc_checkout_is_selected_service', false, $service, $reservedRoom, $roomType);
-					?>
-					<li>
-						<label for="<?php echo $idPrefix; ?>-id" class="mphb-checkbox-label">
-							<input type="checkbox"
-								   name="<?php echo $namePrefix; ?>[id]"
-								   id="<?php echo $idPrefix; ?>-id"
-								   class="mphb_sc_checkout-service mphb_checkout-service"
-								   value="<?php echo $service->getOriginalId(); ?>"
-                                   <?php checked($isSelected); ?> />
 
-							<?php echo $service->getTitle(); ?>
-							<em>(<?php echo $service->getPriceWithConditions( false ); ?>)</em>
-						</label>
-						<?php if ( $service->isPayPerAdult() && $roomType->getAdultsCapacity() > 1 ) { ?>
-							<label for="<?php echo $idPrefix; ?>-adults">
-								<?php _e( 'for ', 'motopress-hotel-booking' ); ?>
-								<select name="<?php echo $namePrefix; ?>[adults]" id ="<?php echo $idPrefix; ?>-adults" class="mphb_sc_checkout-service-adults mphb_checkout-service-adults">
-									<?php
-									for ( $i = 1; $i <= $roomType->getAdultsCapacity(); $i++ ) {
-										?>
-										<option value="<?php echo $i; ?>" <?php selected( $roomType->getAdultsCapacity(), $i ); ?> >
-											<?php echo $i; ?>
-										</option>
-									<?php } ?>
-								</select>
-								<?php echo _x( ' guest(s)', 'Example: Breakfast for X guest(s)', 'motopress-hotel-booking' ); ?>
-							</label>
-						<?php } else { ?>
-							<input type="hidden" name="<?php echo $namePrefix; ?>[adults]" value="1" />
-						<?php } ?>
+                    ?>
+                    <li>
+                        <label for="<?php echo $idPrefix; ?>-id" class="mphb-checkbox-label">
+                            <input type="checkbox" id="<?php echo $idPrefix; ?>-id" name="<?php echo $namePrefix; ?>[id]" class="mphb_sc_checkout-service mphb_checkout-service" value="<?php echo $serviceId; ?>" <?php checked($isSelected); ?>>
+                            <?php echo $service->getTitle(); ?>
+                            <em>(<?php echo $service->getPriceWithConditions(false); ?>)</em>
+                        </label>
+
+                        <?php if ($service->isPayPerAdult() && $roomType->getAdultsCapacity() > 1) { ?>
+                            <label for="<?php echo $idPrefix; ?>-adults">
+                                <?php _e('for ', 'motopress-hotel-booking'); ?>
+                                <select name="<?php echo $namePrefix; ?>[adults]" id="<?php echo $idPrefix; ?>-adults" class="mphb_sc_checkout-service-adults mphb_checkout-service-adults">
+                                    <?php for ($i = 1; $i <= $roomType->getAdultsCapacity(); $i++) { ?>
+                                        <option value="<?php echo $i; ?>" <?php selected($presetAdults, $i); ?>>
+                                            <?php echo $i; ?>
+                                        </option>
+                                    <?php } ?>
+                                </select>
+                                <?php echo _x(' guest(s)', 'Example: Breakfast for X guest(s)', 'motopress-hotel-booking'); ?>
+                            </label>
+                        <?php } else { ?>
+                            <input type="hidden" name="<?php echo $namePrefix; ?>[adults]" value="1">
+                        <?php } ?>
+
                         <?php if ($service->isFlexiblePay()) { ?>
                             <?php
                                 $minQuantity = $service->getMinQuantity();
@@ -363,15 +363,18 @@ class CheckoutView {
                                 }
 
                                 $maxQuantity = max($minQuantity, $maxQuantity);
+
+                                $presetQuantity = apply_filters('mphb_sc_checkout_preset_service_quantity', $minQuantity, $service, $reservedRoom, $roomType);
+                                $presetQuantity = mphb_limit($presetQuantity, $minQuantity, $maxQuantity);
                             ?>
-                            &#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($minQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1" /> <?php _e('time(s)', 'motopress-hotel-booking'); ?>
-						<?php } // Is flexible pay? ?>
-					</li>
-				<?php } ?>
-			</ul>
-		</section>
-		<?php
-	}
+                            &#215; <input type="number" name="<?php echo $namePrefix; ?>[quantity]" class="mphb_sc_checkout-service-quantity mphb_checkout-service-quantity" value="<?php echo esc_attr($presetQuantity); ?>" min="<?php echo esc_attr($minQuantity); ?>" <?php echo !$service->isUnlimited() ? 'max="' . esc_attr($maxQuantity) . '"' : ''; ?> step="1"> <?php _e('time(s)', 'motopress-hotel-booking'); ?>
+                        <?php } // Is flexible pay? ?>
+                    </li>
+                <?php } ?>
+            </ul>
+        </section>
+        <?php
+    }
 
 	public static function renderPriceBreakdown( $booking ){
 		?>

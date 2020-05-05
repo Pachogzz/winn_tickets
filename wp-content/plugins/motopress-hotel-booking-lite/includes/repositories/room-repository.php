@@ -125,19 +125,22 @@ class RoomRepository extends AbstractPostRepository {
 	}
 
 	/**
-	 *
 	 * @param \DateTime $checkIn
 	 * @param \DateTime $checkOut
 	 * @param int $roomTypeId
-	 *
-	 * @return int[] IDs of locked rooms
+     * @param array $atts Optional.
+     *     @param int|int[] $atts['exclude_bookings']
+	 * @return int[] IDs of locked rooms. Will always return original IDs because
+     *     of direct query to the DB.
+     *
+     * @since 3.8 added new argument $atts and parameter "exclude_bookings".
 	 */
-	public function getLockedRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0 ){
-		$searchAtts = array(
+	public function getLockedRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0, $atts = array() ){
+		$searchAtts = array_merge( array(
 			'availability'	 => 'locked',
 			'from_date'		 => $checkInDate,
 			'to_date'		 => $checkOutDate
-		);
+		), $atts );
 
 		if ( $roomTypeId ) {
 			$searchAtts['room_type_id'] = $roomTypeId;
@@ -238,19 +241,20 @@ class RoomRepository extends AbstractPostRepository {
 	}
 
 	/**
-	 *
+	 * @param \DateTime $checkInDate
+	 * @param \DateTime $checkOutDate
+	 * @param type $roomTypeId Optional. 0 by default.
+	 * @return array [%Room type ID% => [%Rooms IDs%]] Will always return original
+     *     IDs because of direct query to the DB.
+     *
 	 * @global \wpdb $wpdb
-	 *
-	 * @param \DateTime $checkIn
-	 * @param \DateTime $checkOut
-	 * @param type $roomTypeId
-	 *
-	 * @return array [%Room type ID% => [%Rooms IDs%]]
+     *
+     * @since 3.8 added new argument $atts and parameter "exclude_bookings".
 	 */
-	public function getAvailableRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0 ){
+	public function getAvailableRooms( \DateTime $checkInDate, \DateTime $checkOutDate, $roomTypeId = 0, $atts = array() ){
 		global $wpdb;
 
-		$lockedRooms = $this->getLockedRooms( $checkInDate, $checkOutDate, $roomTypeId );
+		$lockedRooms = $this->getLockedRooms( $checkInDate, $checkOutDate, $roomTypeId, $atts );
 
 		$query = "SELECT room_type_id.meta_value AS type_id, rooms.ID AS room_id "
 			. "FROM $wpdb->posts AS rooms "

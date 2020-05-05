@@ -28,6 +28,9 @@ class ASP_PP_Handler {
 	public function add_ajax_handlers() {
 		add_action( 'wp_ajax_asp_pp_req_token', array( $this, 'handle_request_token' ) );
 		add_action( 'wp_ajax_nopriv_asp_pp_req_token', array( $this, 'handle_request_token' ) );
+
+		add_action( 'wp_ajax_asp_pp_save_form_data', array( $this, 'save_form_data' ) );
+		add_action( 'wp_ajax_nopriv_asp_pp_save_form_data', array( $this, 'save_form_data' ) );
 	}
 
 	public function showpp() {
@@ -43,6 +46,12 @@ class ASP_PP_Handler {
 		}
 
 		$plan_id = get_post_meta( $product_id, 'asp_sub_plan_id', true );
+
+		if ( ! empty( $plan_id ) && ! class_exists( 'ASPSUB_main' ) ) {
+			//Subs addon not installed or disabled. Show corresponding error message
+			echo ( 'This product requires Stripe Payments Subscription addon.' );
+			exit;
+		}
 
 		if ( ! empty( $plan_id ) && class_exists( 'ASPSUB_main' ) && version_compare( ASPSUB_main::ADDON_VER, '2.0.0t1' ) < 0 ) {
 			echo ( 'Stripe Subscriptions addon version 2.0.0 or newer is required.' );
@@ -165,6 +174,9 @@ class ASP_PP_Handler {
 
 		if ( ! get_post_meta( $product_id, 'asp_product_no_popup_thumbnail', true ) ) {
 			$item_logo = ASP_Utils::get_small_product_thumb( $product_id );
+			if ( $a['is_live'] ) {
+				$item_logo = ASP_Utils::url_to_https( $item_logo );
+			}
 		}
 
 		//stock control
@@ -290,6 +302,8 @@ class ASP_PP_Handler {
 
 		$data['customer_default_country'] = $default_country;
 
+		$data['hide_amount_input'] = $this->item->get_meta( 'asp_product_hide_amount_input' );
+
 		$data['show_your_order'] = get_post_meta( $product_id, 'asp_product_show_your_order', true );
 		$data['show_your_order'] = $data['show_your_order'] ? 1 : 0;
 
@@ -345,7 +359,7 @@ class ASP_PP_Handler {
 			'src'    => 'https://js.stripe.com/v3/',
 		);
 
-		$site_url       = get_site_url();
+		$site_url       = $data['is_live'] ? get_site_url( null, '', 'https' ) : get_site_url();
 		$a['scripts'][] = array(
 			'src'    => $site_url . '/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp',
 			'footer' => true,
@@ -380,6 +394,8 @@ class ASP_PP_Handler {
 			);
 		}
 
+		$a['hide_state_field'] = $this->asp_main->get_setting( 'hide_state_field' );
+
 		$pay_btn_text = $this->asp_main->get_setting( 'popup_button_text' );
 
 		if ( empty( $pay_btn_text ) ) {
@@ -389,14 +405,25 @@ class ASP_PP_Handler {
 		}
 
 		if ( isset( $data['is_trial'] ) && $data['is_trial'] ) {
+			if ( $this->item->get_price() === 0 ) {
+				$data['amount_variable'] = false;
+			}
 			$pay_btn_text = apply_filters( 'asp_customize_text_msg', __( 'Start Free Trial', 'stripe-payments' ), 'start_free_trial' );
 		}
 
+		//filter to change pay button text
+		$pay_btn_text = apply_filters( 'asp_ng_pp_pay_button_text', $pay_btn_text );
+
 		$a['item'] = $this->item;
+
+		$btn_uniq_id = filter_input( INPUT_GET, 'btn_uniq_id', FILTER_SANITIZE_STRING );
+		if ( ! empty( $btn_uniq_id ) ) {
+			$a['btn_uniq_id'] = $btn_uniq_id;
+		}
 
 		$a['vars']['vars'] = array(
 			'data'           => $data,
-			'stripe_key'     => $a['stripe_key'],
+			'stripe_key'     => ! empty( $data['stripe_key'] ) ? $data['stripe_key'] : $a['stripe_key'],
 			'minAmounts'     => $this->asp_main->minAmounts,
 			'zeroCents'      => $this->asp_main->zeroCents,
 			'ajaxURL'        => admin_url( 'admin-ajax.php' ),
@@ -426,6 +453,7 @@ class ASP_PP_Handler {
 				'strStartFreeTrial'           => apply_filters( 'asp_customize_text_msg', __( 'Start Free Trial', 'stripe-payments' ), 'start_free_trial' ),
 				'strInvalidCFValidationRegex' => __( 'Invalid validation RegEx: ', 'stripe-payments' ),
 				'strGetForFree'               => __( 'Purchase for Free', 'stripe-payments' ),
+				'strCurrencyNotSupported'     => __( 'Currency not supported for this payment method.', 'stripe-payments' ),
 			),
 		);
 
@@ -533,6 +561,7 @@ class ASP_PP_Handler {
 						//we have address
 						$addr = array(
 							'line1'   => $billing_details->address->line1,
+							'state'   => isset( $billing_details->address->state ) ? $billing_details->address->state : null,
 							'city'    => isset( $billing_details->address->city ) ? $billing_details->address->city : null,
 							'country' => isset( $billing_details->address->country ) ? $billing_details->address->country : null,
 						);
@@ -554,12 +583,15 @@ class ASP_PP_Handler {
 
 					if ( $shipping_details->name ) {
 						$shipping['name'] = $shipping_details->name;
+					} elseif ( ! empty( $customer_opts['name'] ) ) {
+						$shipping['name'] = $customer_opts['name'];
 					}
 
 					if ( isset( $shipping_details->address ) && isset( $shipping_details->address->line1 ) ) {
 						//we have address
 						$addr = array(
 							'line1'   => $shipping_details->address->line1,
+							'state'   => isset( $shipping_details->address->state ) ? $shipping_details->address->state : null,
 							'city'    => isset( $shipping_details->address->city ) ? $shipping_details->address->city : null,
 							'country' => isset( $shipping_details->address->country ) ? $shipping_details->address->country : null,
 						);
@@ -570,7 +602,9 @@ class ASP_PP_Handler {
 
 						$shipping['address'] = $addr;
 
-						$customer_opts['shipping'] = $shipping;
+						if ( ! empty( $shipping['name'] ) ) {
+							$customer_opts['shipping'] = $shipping;
+						}
 					}
 				}
 
@@ -613,10 +647,12 @@ class ASP_PP_Handler {
 				$intent = \Stripe\PaymentIntent::create( $pi_params );
 			}
 		} catch ( \Exception $e ) {
-			$out['err'] = __( 'Error occurred:', 'stripe-payments' ) . ' ' . $e->getMessage();
+			$out['shipping'] = wp_json_encode( $shipping );
+			$out['err']      = __( 'Error occurred:', 'stripe-payments' ) . ' ' . $e->getMessage();
 			wp_send_json( $out );
 		} catch ( \Throwable $e ) {
-			$out['err'] = __( 'Error occurred:', 'stripe-payments' ) . ' ' . $e->getMessage();
+			$out['shipping'] = wp_json_encode( $shipping );
+			$out['err']      = __( 'Error occurred:', 'stripe-payments' ) . ' ' . $e->getMessage();
 			wp_send_json( $out );
 		}
 
@@ -687,6 +723,14 @@ class ASP_PP_Handler {
 			$output      .= $this->tpl_cf;
 			$this->tpl_cf = '';
 		return $output;
+	}
+
+	public function save_form_data() {
+		$out['success'] = true;
+		$sess           = ASP_Session::get_instance();
+		parse_str( $_POST['form_data'], $form_data );
+		$sess->set_transient_data( 'asp_pp_form_data', $form_data );
+		wp_send_json( $out );
 	}
 
 	public function handle_check_coupon() {

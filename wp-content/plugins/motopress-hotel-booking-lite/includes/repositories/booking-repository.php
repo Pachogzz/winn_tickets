@@ -299,35 +299,44 @@ class BookingRepository extends AbstractPostRepository {
 		return $isSaved;
 	}
 
-	/**
-	 *
-	 * @param int $bookingId
-	 */
-	public function updateReservedRooms( $bookingId ){
+    /**
+     * @param int $bookingId
+     */
+    public function updateReservedRooms($bookingId)
+    {
+        $savedRoomIds = array_filter(
+            array_map(
+                function ($reservedRoom) {
+                    return $reservedRoom->getId();
+                },
+                $this->reservedRooms
+            )
+        );
 
-		$reservedRoomIds = array_filter( array_map( function( Entities\ReservedRoom $reservedRoom ) {
-			return $reservedRoom->getId();
-		}, $this->reservedRooms ) );
+        $existingRooms = MPHB()->getReservedRoomRepository()->findAllByBooking($bookingId);
 
-		$existingRooms		 = MPHB()->getReservedRoomRepository()->findAllByBooking( $bookingId );
-		$roomsToDeleteList	 = array_filter( $existingRooms, function( $existingRoom ) {
-			return !in_array( $existingRoom->getId(), $reservedRoomIds );
-		} );
+        $roomsToDelete = array_filter(
+            $existingRooms,
+            function ($existingRoom) use ($savedRoomIds) {
+                return !in_array($existingRoom->getId(), $savedRoomIds);
+            }
+        );
 
-		foreach ( $roomsToDeleteList as $roomToDelete ) {
-			MPHB()->getReservedRoomRepository()->delete( $roomToDelete );
-		}
+        foreach ($roomsToDelete as $roomToDelete) {
+            MPHB()->getReservedRoomRepository()->delete($roomToDelete);
+        }
 
-		foreach ( $this->reservedRooms as $reservedRoom ) {
-			$reservedRoom->setBookingId( $bookingId );
-			MPHB()->getReservedRoomRepository()->save( $reservedRoom );
-		}
+        foreach ($this->reservedRooms as $reservedRoom) {
+            $reservedRoom->setBookingId($bookingId);
 
-		// refresh stored reserved rooms
-		MPHB()->getReservedRoomRepository()->findAllByBooking( $bookingId, true );
+            MPHB()->getReservedRoomRepository()->save($reservedRoom);
+        }
 
-		unset( $this->reservedRooms );
-	}
+        // Refresh stored reserved rooms
+        MPHB()->getReservedRoomRepository()->findAllByBooking($bookingId, true);
+
+        unset($this->reservedRooms);
+    }
 
     public function getImportedCount()
     {
