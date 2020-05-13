@@ -15,6 +15,8 @@
  * @version 3.8.0
  */
 
+ global $product;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -30,39 +32,39 @@ $product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 
 $boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
 $prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
+
 $prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
+$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
 
 $tabs = $boletosTabs + 1;
 
-$noBoletos = get_post_meta( get_the_ID(), 'boletos_total', true ) / $boletosTabs;
-
+$noBoletos = $product->stock_quantity / $boletosTabs;
 
 ?>
 
 	<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
 		<ul class="tabs wc-tabs" role="tablist">
-		
-			<?php for ($i = 1; $i < $tabs; $i++) : ?>
-				<li class="<?php echo esc_attr( $i ); ?>_tab" id="tab-title-<?php echo esc_attr( $i ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $i ); ?>">
-					<a href="#tab-<?php echo esc_attr( $i ); ?>">
-						<?php echo $prefijoTabs . " " . $i; ?>
+			<?php foreach($prefijoTabs as $num => $tab): ?>
+				<li class="<?php echo esc_attr( $num ); ?>_tab" id="tab-title-<?php echo esc_attr( $num ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $num ); ?>">
+					<a href="#tab-<?php echo esc_attr( $num ); ?>">
+						<?php echo $tab; ?>
 					</a>
 				</li>
-			<?php endfor; ?>
+			<?php endforeach; ?>
 		</ul>
-		<?php for ($i = 1; $i < $tabs; $i++) : ?>
-			<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $i ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $i ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $i ); ?>">
+		<?php foreach($prefijoTabs as $num => $tab): ?>
+			<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $num ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $num ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $num ); ?>">
 				<ul class="list-boletos">
-					<?php for($n = 1; $n < $noBoletos; $n++) : ?>
+					<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
 						<li>
 							<a href="#">
-								<?php echo $prefijoBoletos .  " " . $n; ?>
+								<?php echo $prefijoBoletos[$num] . "-" . $n; ?>
 							</a>
 						</li>
 					<?php endfor; ?>
 				</ul>
 			</div>
-		<?php endfor; ?>
+		<?php endforeach; ?>
 
 		<?php do_action( 'woocommerce_product_after_tabs' ); ?>
 
