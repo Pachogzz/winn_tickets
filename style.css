@@ -18,12 +18,28 @@ ul.list-boletos li{
     vertical-align: top;
     margin-right: 10px;
 }
-ul.list-boletos li a{
-    background-color: #000;
-    color: #fff;
-    padding: 6px;
-    text-decoration: none;
+ul.list-boletos li {
+  color: #000;
+  margin-bottom: 15px;
 }
-ul.list-boletos li a:hover{
-    background-color: aqua;
+
+progress {
+	display:block;
+	-webkit-appearance: none;
+}
+
+progress::-webkit-progress-bar {
+	background: black;
+	border-radius: 50px;
+	padding: 2px;
+}
+progress::-moz-progress-bar {  
+	background: black;
+	border-radius: 50px;
+	padding: 2px;
+} 
+
+progress::-webkit-progress-value {
+	border-radius: 50px;
+	background:orange;
 }

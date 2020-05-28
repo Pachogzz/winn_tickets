@@ -1,7 +1,7 @@
 <?php
 /**
  * Product Data: Boletos del Evento.
- *
+ * Autor: Iván Venegas
  */
 
 
@@ -25,12 +25,23 @@ function boletos_product_settings_tabs( $tabs ){
 add_action( 'woocommerce_product_data_panels', 'boletos_product_panels' );
 function boletos_product_panels(){
 
+
 	$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
 	$boletosTabs = $boletosTabs +1;
 
 	$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
 	$prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
 	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
+
+	$stock = get_post_meta( get_the_ID(), '_stock', true );
+	$cantidadTotal = "";
+	$suma = 0;
+
+	foreach ($cantidadBoletos as $key => $value) {
+		$suma += $value;
+	}
+
+	$cantidadTotal = $stock - $suma;
  
 	echo '<div id="boletos_product_data" class="panel woocommerce_options_panel">';
 
@@ -65,8 +76,25 @@ function boletos_product_panels(){
 				));
 			}
 		echo '</div>';
+	
 
 		?>
+
+			<?php if($cantidadTotal == 0): ?>
+				
+			<?php else: ?>
+					<?php if( $cantidadTotal >= 0): ?>
+						<div style="background-color: #ff0000; color: #fff; padding: 10px;">
+							Restante de boletos: <strong><?php echo $cantidadTotal; ?></strong>
+						</div>
+					<?php elseif($cantidadTotal < 0): ?>
+						<div style="background-color: #ff0000; color: #fff; padding: 10px;">
+							El total de boletos no coincide con el stock en inventario
+						</div>
+					<?php endif; ?>
+			<?php endif; ?>
+			
+
 			<?php for($i=1; $i < $boletosTabs; $i++): ?>
 				<p class="form-field dimensions_field">
 					<label for="product_length">Boletos de la seccion: <?php echo $i; ?></label>
@@ -76,6 +104,10 @@ function boletos_product_panels(){
 					</span>			
 				</p>
 			<?php endfor; ?>
+			<hr>
+			<div style="margin-left:15px; margin-bottom:20px;">
+				<h3><?php echo "Total boletos: " . $suma;?></h3>
+			</div>
 
 		<?php
  
@@ -119,3 +151,73 @@ function boletos_css_icon(){
 	}
 	</style>';
 }
+
+
+function tabs_boletos() {
+
+	$product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
+
+	$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
+	$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
+
+	$prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
+	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
+
+	$tabs = $boletosTabs + 1;
+
+	$noBoletos = $product->stock_quantity / $boletosTabs;
+
+	?>
+		<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
+			<ul class="tabs wc-tabs" role="tablist">
+				<?php foreach($prefijoTabs as $num => $tab): ?>
+					<li class="<?php echo esc_attr( $num ); ?>_tab" id="tab-title-<?php echo esc_attr( $num ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $num ); ?>">
+						<a href="#tab-<?php echo esc_attr( $num ); ?>">
+							<?php echo $tab; ?>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+			<?php foreach($prefijoTabs as $num => $tab): ?>
+				<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $num ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $num ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $num ); ?>">
+					<ul class="list-boletos">
+						<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
+							<li>
+								<?php echo $prefijoBoletos[$num] . "-" . $n; ?></label>
+								<input type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>"> <label for="boleto">
+							</li>
+						<?php endfor; ?>
+					</ul>
+				</div>
+			<?php endforeach; ?>
+
+			<?php do_action( 'woocommerce_product_after_tabs' ); ?>
+
+		</div>
+
+	<?php
+}
+add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+
+
+function render_meta_on_cart_item( $title = null, $cart_item = null, $cart_item_key = null ) {
+    if( $cart_item_key && is_cart() ) {
+        echo $title . '<dl class="">
+                 	<dt class="">Boletos : </dt>
+					 <dd class=""> ';
+
+					foreach ($cart_item['tinvwl_formdata']['boleto'] as $key => $value) {
+						echo $value .' - ';
+					}
+					 	
+		echo '</dd></dl>';
+    }else {
+        echo $title;
+    }
+}
+add_filter( 'woocommerce_cart_item_name', 'render_meta_on_cart_item', 1, 3 );
+
+function tshirt_order_meta_handler( $item_id, $values, $cart_item_key ) {
+    wc_add_order_item_meta( $item_id, "boleto", WC()->session->get( $cart_item_key.'boleto') );    
+}
+add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
