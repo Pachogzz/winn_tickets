@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see woocommerce_default_product_tabs()
  */
 
-
+$product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 ?>
 
 <?php
@@ -60,3 +60,10 @@ if ( ! empty( $product_tabs ) ) : ?>
 	</div>
 
 <?php endif; ?>
+
+
+<script>
+	jQuery( document ).ready(function() {
+    	jQuery("#tab-1").css('display','block');
+	});
+</script>

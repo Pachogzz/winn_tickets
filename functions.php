@@ -155,7 +155,6 @@ function boletos_css_icon(){
 
 function tabs_boletos() {
 
-	$product_tabs = apply_filters( 'woocommerce_product_tabs', array() );
 
 	$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
 	$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
@@ -171,7 +170,7 @@ function tabs_boletos() {
 		<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
 			<ul class="tabs wc-tabs" role="tablist">
 				<?php foreach($prefijoTabs as $num => $tab): ?>
-					<li class="<?php echo esc_attr( $num ); ?>_tab" id="tab-title-<?php echo esc_attr( $num ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $num ); ?>">
+					<li class="<?php echo esc_attr( $num ); ?>_tab active" id="tab-title-<?php echo esc_attr( $num ); ?>" role="tab" aria-controls="tab-<?php echo esc_attr( $num ); ?>">
 						<a href="#tab-<?php echo esc_attr( $num ); ?>">
 							<?php echo $tab; ?>
 						</a>
