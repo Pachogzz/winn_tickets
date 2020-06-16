@@ -22,6 +22,7 @@ add_action( 'woocommerce_product_data_panels', 'eventodata_panels' );
 function eventodata_panels(){
 
 	$day_evento = get_post_meta( get_the_ID(), '_day-evento', true );
+	$num_evento = get_post_meta( get_the_ID(), '_num-evento', true );
 	$month_evento = get_post_meta( get_the_ID(), '_month-evento', true );
 	$hour_evento = get_post_meta( get_the_ID(), '_hour-evento', true );
 	$year_evento = get_post_meta( get_the_ID(), '_year-evento', true );
@@ -49,6 +50,45 @@ function eventodata_panels(){
 				);
 
 				woocommerce_wp_select( array(
+					'id'		=> '_num-evento',
+					'label'		=> 'Día del evento (#):',
+					'options'	=> array(
+								'1'		=> __('1', 'woocommerce'),
+								'2'		=> __('2', 'woocommerce'),
+								'3'		=> __('3', 'woocommerce'),
+								'4'		=> __('4', 'woocommerce'),
+								'5'		=> __('5', 'woocommerce'),
+								'6'		=> __('6', 'woocommerce'),
+								'7'		=> __('7', 'woocommerce'),
+								'8'		=> __('8', 'woocommerce'),
+								'9'		=> __('9', 'woocommerce'),
+								'10'	=> __('10', 'woocommerce'),
+								'11'	=> __('11', 'woocommerce'),
+								'12'	=> __('12', 'woocommerce'),
+								'13'	=> __('13', 'woocommerce'),
+								'14'	=> __('14', 'woocommerce'),
+								'15'	=> __('15', 'woocommerce'),
+								'16'	=> __('16', 'woocommerce'),
+								'17'	=> __('17', 'woocommerce'),
+								'18'	=> __('18', 'woocommerce'),
+								'19'	=> __('19', 'woocommerce'),
+								'20'	=> __('20', 'woocommerce'),
+								'21'	=> __('21', 'woocommerce'),
+								'22'	=> __('22', 'woocommerce'),
+								'23'	=> __('23', 'woocommerce'),
+								'24'	=> __('24', 'woocommerce'),
+								'25'	=> __('25', 'woocommerce'),
+								'26'	=> __('26', 'woocommerce'),
+								'27'	=> __('27', 'woocommerce'),
+								'28'	=> __('28', 'woocommerce'),
+								'29'	=> __('29', 'woocommerce'),
+								'30'	=> __('30', 'woocommerce'),
+								'31'	=> __('31', 'woocommerce')
+						)
+					)
+				);
+
+				woocommerce_wp_select( array(
 					'id'		=> '_month-evento',
 					'label'		=> 'Mes del evento:',
 					'options'	=> array(
@@ -68,9 +108,7 @@ function eventodata_panels(){
 					)
 				);
 				
-				// Hora del evento
-				woocommerce_wp_select( 
-				array( 
+				woocommerce_wp_select( array( 
 					'id'		=> '_hour-evento', 
 					'label'		=> __( 'Seleccione la hora', 'woocommerce' ), 
 					'options'	=> array(
@@ -236,6 +274,10 @@ function save_eventodata( $post_id ){
 	if(!empty( $day_evento )){
 		update_post_meta( $post_id, '_day-evento', esc_attr( $day_evento ));
 	}
+	$num_evento = $_POST['_num-evento'];
+	if(!empty( $num_evento )){
+		update_post_meta( $post_id, '_num-evento', esc_attr( $num_evento ));
+	}
 	$month_evento = $_POST['_month-evento'];
 	if(!empty( $month_evento )){
 		update_post_meta( $post_id, '_month-evento', esc_attr( $month_evento ));
@@ -261,10 +303,33 @@ add_action( 'woocommerce_process_product_meta_variable', 'save_eventodata'  );
  * Show info on product page
  */
 function data_eventos() {
-	echo get_post_meta( get_the_ID(), '_day-evento', true ) . "<hr/>";
-	echo get_post_meta( get_the_ID(), '_month-evento', true ) . "<hr/>";
-	echo get_post_meta( get_the_ID(), '_hour-evento', true ) . "<hr/>";
-	echo get_post_meta( get_the_ID(), '_year-evento', true ) . "<hr/>";
-	echo get_post_meta( get_the_ID(), '_location-evento', true ) . "<br/>";
+
+	$_day_evt 		= get_post_meta( get_the_ID(), '_day-evento', true );
+	$_num_evt 		= get_post_meta( get_the_ID(), '_num-evento', true );
+	$_month_evt 	= get_post_meta( get_the_ID(), '_month-evento', true );
+	$_hour_evt 		= get_post_meta( get_the_ID(), '_hour-evento', true );
+	$_year_evt 		= get_post_meta( get_the_ID(), '_year-evento', true );
+	$_location_evt 	= get_post_meta( get_the_ID(), '_location-evento', true );
+
+	echo 	"<div id='event_data_details' class='event_data-details'>
+				<div class='event_data-columns'>
+					<div class='event_data-col event_data-icon'>
+						<i class='fa fa-calendar fa-2x' aria-hidden='true'></i>
+					</div>
+					<div class='event_data-col event_data-text'>
+						<h4 class='event_data-title'>" . __('Fecha del evento') . "</h4>
+						<span>" . $_month_evt . " " . $_num_evt . ", " . $_year_evt . "<br/>" . $_hour_evt . "</span>
+					</div>
+				</div>
+				<div class='event_data-columns'>
+					<div class='event_data-col event_data-icon'>
+						<i class='fa fa-map-marker fa-2x' aria-hidden='true'></i>
+					</div>
+					<div class='event_data-col event_data-text'>
+						<h4 class='event_data-title'>" . __('Ubicación') . "</h4>
+						<span>" . $_location_evt . "</span>					
+					</div>
+				</div>
+			</div>";
 }
 add_action( 'woocommerce_single_product_summary', 'data_eventos' );

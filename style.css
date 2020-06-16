@@ -60,22 +60,8 @@ progress::-webkit-progress-value {
 
 #trigger[type=checkbox] {
 	display: none;
-
-/*	display: inline-block;
-	width: 100%;
-	height: 40px;*/
 }
 #trigger[type=checkbox] + span {
-/*	display: inline-block;
-	background-color: lightgrey;
-	width: 100%;
-	height: 40px;
-	padding: 0;
-	cursor: pointer;*/
-
-	/*position: absolute;
-	top: 0;
-	left: 0;*/
 	text-align: center;
 	background-image: url(assets/img/ticket-icon-op1.png);
 	background-position: top center;
@@ -88,8 +74,32 @@ progress::-webkit-progress-value {
 	font-size: 14px;
 }
 #trigger[type=checkbox]:checked + span {
-	/*background-color: lightgreen;*/
 	padding: 0;
-
 	background-position: center center;
+}
+
+.event_data-details{}
+.event_data-details .event_data-columns{}
+.event_data-details .event_data-columns .event_data-col{
+	border: 1px solid red;
+	float: left;
+}
+.event_data-details .event_data-icon{
+	width: 25%;
+	text-align: center;
+}
+.event_data-details .event_data-text{
+	width: 70%;
+	margin-left: 5%;
+}
+.event_data-details .event_data-icon i{
+	color: #b4823e;
+}
+.event_data-details .event_data-title{
+	border: 1px solid green;
+}
+.event_data-details .event_data-text span{
+	display: block;
+	widows: 100%;
+	border: 1px solid orange;
 }
