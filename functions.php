@@ -166,6 +166,13 @@ function tabs_boletos() {
 
 	$noBoletos = $product->stock_quantity / $boletosTabs;
 
+	global $woocommerce;
+	foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) {
+		$boletos = count($cart_item["tinvwl_formdata"]['boleto']);
+		$boletos = (string) $boletos;
+		$woocommerce->cart->set_quantity($cart_item_key, $boletos);
+	}
+
 	?>
 		<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
 			<ul class="tabs wc-tabs" role="tablist">
@@ -200,6 +207,7 @@ add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 
 
 function render_meta_on_cart_item( $title = null, $cart_item = null, $cart_item_key = null ) {
+
     if( $cart_item_key && is_cart() ) {
         echo $title . '<dl class="">
                  	<dt class="">Boletos : </dt>
@@ -212,11 +220,54 @@ function render_meta_on_cart_item( $title = null, $cart_item = null, $cart_item_
 		echo '</dd></dl>';
     }else {
         echo $title;
-    }
+	}
+
 }
 add_filter( 'woocommerce_cart_item_name', 'render_meta_on_cart_item', 1, 3 );
 
 function tshirt_order_meta_handler( $item_id, $values, $cart_item_key ) {
-    wc_add_order_item_meta( $item_id, "boleto", WC()->session->get( $cart_item_key.'boleto') );    
+	wc_add_order_item_meta( $item_id, "boleto", WC()->session->get( $cart_item_key.'boleto') );   
 }
 add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
+
+
+
+/**
+* Add custom field to the checkout page
+*/
+
+add_action('woocommerce_after_order_notes', 'custom_checkout_field');
+function custom_checkout_field($checkout){
+
+	global $woocommerce;
+	$items = $woocommerce->cart->get_cart();
+	
+	
+	
+
+	echo '<div id="custom_checkout_field"><h4>' . __('Boleto') . '</h4>';
+	woocommerce_form_field('custom_field_name', array(
+		'type' => 'text',
+		'class' => array(
+			'my-field-class form-row-wide'
+		),
+		'label' => __('Custom Additional Field') ,
+		'placeholder' => __('New Custom Field') ,
+	),
+	$checkout->get_value('custom_field_name'));
+	echo '</div>';
+
+
+}
+
+
+/**
+* Update the value given in custom field
+*/
+
+add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
+function custom_checkout_field_update_order_meta($order_id){
+	if (!empty($_POST['custom_field_name'])) {
+		update_post_meta($order_id, 'Some Field', sanitize_text_field($_POST['custom_field_name']));
+	}
+}
