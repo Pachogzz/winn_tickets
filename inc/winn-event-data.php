@@ -1,9 +1,19 @@
 <?php
+
+/**
+ * Move outside tab the description of single product
+ */
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+function woocommerce_template_product_description() {
+  wc_get_template( 'single-product/tabs/description.php' );
+}
+add_action( 'woocommerce_product_meta_end', 'woocommerce_template_product_description', 20 );
+
 /**
  * Event Data: Datos extra del Evento.
  * Autor: Pacho Gonzalez
  */
-// require_once( get_template_directory() . '/inc/winn-event-data.php' );
+
 add_filter('woocommerce_product_data_tabs', 'datosevento_settings_tabs' );
 function datosevento_settings_tabs( $tabs ){
  

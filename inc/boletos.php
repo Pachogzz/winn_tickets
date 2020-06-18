@@ -200,7 +200,8 @@ function tabs_boletos() {
 
 	<?php
 }
-add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+// add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos', 0 );
 
 
 function render_meta_on_cart_item( $title = null, $cart_item = null, $cart_item_key = null ) {
