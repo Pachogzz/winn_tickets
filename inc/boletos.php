@@ -166,7 +166,7 @@ function tabs_boletos() {
 
 	global $woocommerce;
 	foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) {
-		$boletos = count($cart_item["tinvwl_formdata"]['boleto']);
+		$boletos = count($cart_item['boleto']);
 		$boletos = (string) $boletos;
 		$woocommerce->cart->set_quantity($cart_item_key, $boletos);
 	}
@@ -200,40 +200,59 @@ function tabs_boletos() {
 
 	<?php
 }
-// add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
-add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos', 0 );
+add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+// add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos', 0 );
 
 
-function render_meta_on_cart_item( $title = null, $cart_item = null, $cart_item_key = null ) {
-
-    if( $cart_item_key && is_cart() ) {
-        echo $title . '<dl class="">
-                 	<dt class="">Boletos : </dt>
-					 <dd class=""> ';
-
-					foreach ($cart_item['tinvwl_formdata']['boleto'] as $key => $value) {
-						echo $value .' - ';
-					}
-					 	
-		echo '</dd></dl>';
-    }else {
-        echo $title;
-	}
-
+/**
+ * Add custom cart item data
+ */
+function plugin_republic_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
+    if( isset( $_POST['boleto'] )){
+        $cart_item_data['boleto'] = $_POST['boleto'];
+    }
+    return $cart_item_data;
 }
-add_filter( 'woocommerce_cart_item_name', 'render_meta_on_cart_item', 1, 3 );
+add_filter( 'woocommerce_add_cart_item_data', 'plugin_republic_add_cart_item_data', 10, 3 );
 
-function tshirt_order_meta_handler( $item_id, $values, $cart_item_key ) {
-	wc_add_order_item_meta( $item_id, "boleto", WC()->session->get( $cart_item_key.'boleto') );   
+/**
+ * Add custom cart item data to cart
+ */
+function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
+    if( isset( $cart_item_data['boleto'])){
+
+        foreach ($cart_item_data['boleto'] as $boleto) {
+            $totalBoletos .= $boleto . ", ";
+        }
+
+        $item_data[] = array(
+            'key' => __( 'Boleto'),
+            'value' => $totalBoletos,
+        );
+    }
+    return $item_data;
 }
-add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
+add_filter( 'woocommerce_get_item_data', 'plugin_republic_get_item_data', 10, 2 );
 
+/**
+ * Add custom cart item data to emails
+ */
+function plugin_republic_order_item_name( $product_name, $item ) {
+    if( isset( $item['pr_field'] ) ) {
+        $product_name .= sprintf(
+            '<ul><li>%s: %s</li></ul>',
+                __( 'Your name', 'plugin_republic' ),
+                esc_html( $item['pr_field'] )
+            );
+    }
+    return $product_name;
+   }
+add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );
 
 
 /**
 * Add custom field to the checkout page
 */
-
 add_action('woocommerce_after_order_notes', 'custom_checkout_field');
 function custom_checkout_field($checkout){
 
@@ -261,7 +280,6 @@ function custom_checkout_field($checkout){
 /**
 * Update the value given in custom field
 */
-
 add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
 function custom_checkout_field_update_order_meta($order_id){
 	if (!empty($_POST['custom_field_name'])) {
