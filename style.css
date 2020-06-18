@@ -79,13 +79,17 @@ progress::-webkit-progress-value {
 }
 
 .event_data-details{}
-.event_data-details .event_data-columns{}
+.event_data-details .event_data-columns{
+	overflow: hidden;
+	border-bottom: 1px solid #b4823e;
+	margin-bottom: 15px;
+	padding-bottom: 15px;
+}
 .event_data-details .event_data-columns .event_data-col{
-	border: 1px solid red;
 	float: left;
 }
 .event_data-details .event_data-icon{
-	width: 25%;
+	width: 20%;
 	text-align: center;
 }
 .event_data-details .event_data-text{
@@ -94,12 +98,13 @@ progress::-webkit-progress-value {
 }
 .event_data-details .event_data-icon i{
 	color: #b4823e;
+	line-height: 4.3rem;
 }
 .event_data-details .event_data-title{
-	border: 1px solid green;
+	font-weight: 600;
+	margin-bottom: 0px;
 }
 .event_data-details .event_data-text span{
 	display: block;
 	widows: 100%;
-	border: 1px solid orange;
 }

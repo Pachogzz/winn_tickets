@@ -317,8 +317,8 @@ function data_eventos() {
 						<i class='fa fa-calendar fa-2x' aria-hidden='true'></i>
 					</div>
 					<div class='event_data-col event_data-text'>
-						<h4 class='event_data-title'>" . __('Fecha del evento') . "</h4>
-						<span>" . $_month_evt . " " . $_num_evt . ", " . $_year_evt . "<br/>" . $_hour_evt . "</span>
+						<h5 class='event_data-title'>" . __('Fecha del evento') . "</h5>
+						<span>" . $_day_evt. " " . $_num_evt . " " . __(' de ') . " " . $_month_evt . " " . __('del') . " " . $_year_evt . ", " . $_hour_evt . ".</span>
 					</div>
 				</div>
 				<div class='event_data-columns'>
@@ -326,7 +326,7 @@ function data_eventos() {
 						<i class='fa fa-map-marker fa-2x' aria-hidden='true'></i>
 					</div>
 					<div class='event_data-col event_data-text'>
-						<h4 class='event_data-title'>" . __('Ubicación') . "</h4>
+						<h5 class='event_data-title'>" . __('Ubicación') . "</h5>
 						<span>" . $_location_evt . "</span>					
 					</div>
 				</div>
