@@ -149,6 +149,9 @@ function boletos_css_icon(){
 	#woocommerce-product-data ul.wc-tabs li.boletos_options.boletos_tab a:before{
 		content: "\f486";
 	}
+	#woocommerce-product-data ul.wc-tabs li.eventodata_options.eventodata_tab a:before{
+		content: "\f119";
+	}
 	</style>';
 }
 
@@ -182,8 +185,7 @@ function tabs_boletos() {
 					<ul class="list-boletos">
 						<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
 							<li>
-								<?php echo $prefijoBoletos[$num] . "-" . $n; ?></label>
-								<input type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>"> <label for="boleto">
+								<label><input id="trigger" type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
 							</li>
 						<?php endfor; ?>
 					</ul>
@@ -220,3 +222,6 @@ function tshirt_order_meta_handler( $item_id, $values, $cart_item_key ) {
     wc_add_order_item_meta( $item_id, "boleto", WC()->session->get( $cart_item_key.'boleto') );    
 }
 add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
+
+/* Extra fields on product admin page */
+include get_stylesheet_directory() . '/inc/winn-event-data.php';
