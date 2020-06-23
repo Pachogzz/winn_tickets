@@ -31,12 +31,13 @@ function datosevento_settings_tabs( $tabs ){
 add_action( 'woocommerce_product_data_panels', 'eventodata_panels' );
 function eventodata_panels(){
 
-	$day_evento = get_post_meta( get_the_ID(), '_day-evento', true );
-	$num_evento = get_post_meta( get_the_ID(), '_num-evento', true );
-	$month_evento = get_post_meta( get_the_ID(), '_month-evento', true );
-	$hour_evento = get_post_meta( get_the_ID(), '_hour-evento', true );
-	$year_evento = get_post_meta( get_the_ID(), '_year-evento', true );
-	$location_evento = get_post_meta( get_the_ID(), '_location-evento', true );
+	$day_evento 		= get_post_meta( get_the_ID(), '_day-evento', true );
+	$num_evento 		= get_post_meta( get_the_ID(), '_num-evento', true );
+	$month_evento 		= get_post_meta( get_the_ID(), '_month-evento', true );
+	$hour_evento 		= get_post_meta( get_the_ID(), '_hour-evento', true );
+	$year_evento 		= get_post_meta( get_the_ID(), '_year-evento', true );
+	$location_evento 	= get_post_meta( get_the_ID(), '_location-evento', true );
+	$live_evento 		= get_post_meta( get_the_ID(), '_live-evento', true );
  
 	echo '<div id="eventodata_product_data" class="panel woocommerce_options_panel">';
  
@@ -266,6 +267,12 @@ function eventodata_panels(){
 					'value'             => '',
 					'label'             => 'Ubicación del evento:'
 				));
+
+				woocommerce_wp_text_input( array(
+					'id'                => '_live-evento',
+					'value'             => '',
+					'label'             => 'Liga del livestream:'
+				));
 		echo '</span>
 			</p>
 		</div>';
@@ -304,6 +311,10 @@ function save_eventodata( $post_id ){
 	if (!empty( $location_evento )){
 		update_post_meta( $post_id, '_location-evento', esc_html( $location_evento ));
 	}
+	$live_evento = $_POST['_live-evento'];
+	if (!empty( $live_evento )){
+		update_post_meta( $post_id, '_live-evento', esc_attr( $live_evento ));
+	}
 
 }
 add_action( 'woocommerce_process_product_meta_simple', 'save_eventodata'  );
@@ -320,6 +331,7 @@ function data_eventos() {
 	$_hour_evt 		= get_post_meta( get_the_ID(), '_hour-evento', true );
 	$_year_evt 		= get_post_meta( get_the_ID(), '_year-evento', true );
 	$_location_evt 	= get_post_meta( get_the_ID(), '_location-evento', true );
+	$_live_evt 		= get_post_meta( get_the_ID(), '_live-evento', true );
 
 	echo 	"<div id='event_data_details' class='event_data-details'>
 				<div class='event_data-columns'>
@@ -340,6 +352,16 @@ function data_eventos() {
 						<span>" . $_location_evt . "</span>					
 					</div>
 				</div>
+				<div class='event_data-columns'>
+					<div class='event_data-col event_data-icon'>
+						<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
+					</div>
+					<div class='event_data-col event_data-text'>
+						<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
+						<span>" . $_live_evt . "</span>					
+					</div>
+				</div>
 			</div>";
 }
 add_action( 'woocommerce_single_product_summary', 'data_eventos' );
+add_action( 'woocommerce_process_product_meta', 'data_eventos' );
