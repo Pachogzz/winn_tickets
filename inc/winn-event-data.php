@@ -351,17 +351,48 @@ function data_eventos() {
 						<h5 class='event_data-title'>" . __('Ubicación') . "</h5>
 						<span>" . $_location_evt . "</span>					
 					</div>
-				</div>
-				<div class='event_data-columns'>
-					<div class='event_data-col event_data-icon'>
-						<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
+				</div>"
+	;
+	if (!empty( $_live_evt )) {
+		echo 	"<div class='event_data-columns'>
+						<div class='event_data-col event_data-icon'>
+							<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
+						</div>
+						<div class='event_data-col event_data-text'>
+							<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
+							<span><a href='" . $_live_evt . "' class='btn' target='_blank'>Ir al stream</a></span>					
+						</div>
 					</div>
-					<div class='event_data-col event_data-text'>
-						<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
-						<span>" . $_live_evt . "</span>					
-					</div>
-				</div>
-			</div>";
+				</div>";
+	}
 }
 add_action( 'woocommerce_single_product_summary', 'data_eventos' );
 add_action( 'woocommerce_process_product_meta', 'data_eventos' );
+
+/**
+ * Change HTML layout of price tags
+ */
+add_filter( 'woocommerce_get_price_html', 'bbloomer_add_price_prefix', 99, 2 ); 
+function bbloomer_add_price_prefix( $price, $product ){
+    $price = '
+			<div id="event_data_details" class="event_data-details">
+				<div class="event_data-columns">
+					<div class="event_data-col event_data-icon">
+						<i class="fa fa-dollar fa-2x" aria-hidden="true"></i>
+					</div>
+					<div class="event_data-col event_data-text">
+						<h5 class="event_data-title">' . __('Costo por ticket') . '</h5>
+						<span>
+    ' . $price;
+    return $price;
+}
+add_filter( 'woocommerce_get_price_suffix', 'event_add_price_suffix', 99, 4 );
+function event_add_price_suffix( $html, $product, $price, $qty ){
+    $html .= '
+						</span>
+					</div>
+				</div>
+			</div>
+   	';
+    return $html;
+}
