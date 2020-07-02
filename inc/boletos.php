@@ -166,9 +166,13 @@ function tabs_boletos() {
 
 	global $woocommerce;
 	foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) {
-		$boletos = count($cart_item['boleto']);
-		$boletos = (string) $boletos;
-		$woocommerce->cart->set_quantity($cart_item_key, $boletos);
+
+        if (!empty($cart_item['boleto'])) {
+            $boletos = count($cart_item['boleto']);
+            $boletos = (string) $boletos;
+            $woocommerce->cart->set_quantity($cart_item_key, $boletos);
+        }
+		
 	}
 
 	?>
@@ -201,7 +205,7 @@ function tabs_boletos() {
 	<?php
 }
 add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
-// add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos', 0 );
+// add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos');
 
 
 /**
