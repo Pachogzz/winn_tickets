@@ -275,7 +275,9 @@ add_filter( 'woocommerce_get_item_data', 'plugin_republic_get_item_data', 10, 2 
 /**
 * Add custom field to the checkout page
 */
-add_action('woocommerce_after_order_notes', 'custom_checkout_field');
+
+add_action('woocommerce_before_checkout_billing_form', 'custom_checkout_field');
+// add_action('woocommerce_after_order_notes', 'custom_checkout_field');
 function custom_checkout_field($checkout){
 
 	global $woocommerce;
@@ -285,6 +287,8 @@ function custom_checkout_field($checkout){
 		$boletos = $value['boleto'];
 	}
 
+	echo "<div class='checkout_page-ticketforms'>"; // added by pacho
+
 	foreach ($boletos as $boleto) {
 
 		echo '<div id="custom_checkout_field"><h4>' . __('Boleto') . " " . $boleto . '</h4>';
@@ -292,7 +296,8 @@ function custom_checkout_field($checkout){
 			woocommerce_form_field('custom_field_name', array(
 				'type' => 'text',
 				'class' => array(
-					'my-field-class form-row-wide'
+					'my-field-class'
+					// 'my-field-class form-row-wide'
 				),
 				'label' => __('Nombre')
 			),
@@ -301,7 +306,8 @@ function custom_checkout_field($checkout){
 			woocommerce_form_field('custom_field_name', array(
 				'type' => 'text',
 				'class' => array(
-					'my-field-class form-row-wide'
+					'my-field-class'
+					// 'my-field-class form-row-wide'
 				),
 				'label' => __('Apellido')
 			),
@@ -310,7 +316,8 @@ function custom_checkout_field($checkout){
 			woocommerce_form_field('custom_field_name', array(
 				'type' => 'text',
 				'class' => array(
-					'my-field-class form-row-wide'
+					'my-field-class'
+					// 'my-field-class form-row-wide'
 				),
 				'label' => __('Teléfono')
 			),
@@ -319,7 +326,8 @@ function custom_checkout_field($checkout){
 			woocommerce_form_field('custom_field_name', array(
 				'type' => 'text',
 				'class' => array(
-					'my-field-class form-row-wide'
+					'my-field-class'
+					// 'my-field-class form-row-wide'
 				),
 				'label' => __('Correo')
 			),
@@ -328,6 +336,8 @@ function custom_checkout_field($checkout){
 		echo '</div>';
 
 	}
+
+	echo "</div>"; // added by pacho
 
 }
 

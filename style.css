@@ -18,6 +18,42 @@ Template: dt-the7
     color: #fff;
     font-weight: 600;
 }
+.inline-header .header-bar > .mini-widgets, 
+.inline-header .widget-box .mini-widgets{
+	padding-left: 20px;
+}
+
+/*Show hide dashboard icon on menu bar*/
+.goto-dashboard,
+.goto-dashboard a{
+	display: none !important;
+}
+.goto-dashboard a .menu-item-text i.underline{
+	display: none;
+	opacity: 0;
+	visibility: hidden;
+}
+.logged-in .goto-dashboard{
+    padding: 5px 10px;
+	display: block !important;
+}
+.logged-in .goto-dashboard a{
+	display: block !important;
+    background: #b4823e;
+    padding: 8px 10px;
+    border-radius: 0px;
+}
+.logged-in .goto-dashboard a:hover{
+	opacity: .7;
+}
+.logged-in .goto-dashboard a span.menu-text{
+    font: 14px / 18px "Poppins", Helvetica, Arial, Verdana, sans-serif;
+    color: #fff;
+    font-weight: 600;
+}
+.logged-in .goto-dashboard a:hover span.menu-text{
+	color: #fff !important;
+}
 
 /* Single Product */
 ul.list-boletos{
@@ -58,6 +94,7 @@ progress::-webkit-progress-value {
 	background:orange;
 }
 
+/* CSS for tickets icons ( substitution of checkboxes ) */
 #trigger[type=checkbox] {
 	display: none;
 }
@@ -78,6 +115,7 @@ progress::-webkit-progress-value {
 	background-position: center center;
 }
 
+/* CSS for event info on product page */
 .event_data-details{}
 .event_data-details .event_data-columns{
 	overflow: hidden;
@@ -154,4 +192,28 @@ div.product div.summary .price::after {
 .woocom-list-content .price .woocommerce-Price-currencySymbol{
 	display: inline-block;
 	margin-right: 5px;
+}
+
+/* Checkout Ticket data */
+.checkout_page-ticketforms{
+	background: #f7f7f7;
+	padding: 25px 30px 20px;
+	margin-bottom: 30px;
+}
+.checkout_page-ticketforms #custom_checkout_field{
+	overflow: hidden;
+	border-bottom: 1px solid #b4823e;
+	margin-bottom: 10px;
+}
+.checkout_page-ticketforms #custom_checkout_field:last-child{
+	border-bottom: none;
+	margin-bottom: 0;
+}
+.checkout_page-ticketforms #custom_checkout_field .my-field-class{
+	padding-bottom: 0;
+	float: left;
+	width: 47%;
+}
+.checkout_page-ticketforms #custom_checkout_field .my-field-class:nth-child(even){
+	margin-right: 2%;
 }
