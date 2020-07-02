@@ -108,3 +108,25 @@ progress::-webkit-progress-value {
 	display: block;
 	widows: 100%;
 }
+.event_data-details .event_data-text .btn{
+	display: inline-block;
+	padding: 5px 10px;
+	text-decoration: none;
+	text-align: center;
+	color: #fff;
+	background: #b4823e;
+	border: 1px solid #fff;
+}
+.event_data-details .event_data-text .btn:hover{
+	background: #fff;
+	color: #b4823e;
+	border: 1px solid #b4823e;
+}
+
+.woocommerce div.product div.summary > .price{
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+div.product div.summary .price::after {
+	display: none;
+}
