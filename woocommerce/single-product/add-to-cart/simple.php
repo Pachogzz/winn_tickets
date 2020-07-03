@@ -27,8 +27,7 @@ echo wc_get_stock_html( $product ); // WPCS: XSS ok.
 
 if ( $product->is_in_stock() ) : ?>
 
-	Status de ocupación
-	<progress id="progress2" max="100" value="0" style="margin-bottom:20px;" ></progress>
+	<!-- <progress id="progress2" max="100" value="0" style="margin-bottom:20px;" ></progress> -->
 
 	<?php do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 

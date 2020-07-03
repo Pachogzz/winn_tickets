@@ -73,27 +73,6 @@ ul.list-boletos li {
   position: relative;
 }
 
-progress {
-	display:block;
-	-webkit-appearance: none;
-}
-
-progress::-webkit-progress-bar {
-	background: black;
-	border-radius: 50px;
-	padding: 2px;
-}
-progress::-moz-progress-bar {  
-	background: black;
-	border-radius: 50px;
-	padding: 2px;
-} 
-
-progress::-webkit-progress-value {
-	border-radius: 50px;
-	background:orange;
-}
-
 /* CSS for tickets icons ( substitution of checkboxes ) */
 #trigger[type=checkbox] {
 	display: none;
@@ -167,6 +146,43 @@ progress::-webkit-progress-value {
 div.product div.summary .price::after {
 	display: none;
 }
+	/*Progress bar styles*/
+	progress:not([value]) {
+		/* Styling here */
+	}
+	progress {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		
+		background: #001a3e;
+		
+		border: none;
+		width: 100%;
+		height: 20px;
+
+		border: 3px solid #001a3e;
+		-webkit-border-radius: 7px; 
+		-moz-border-radius: 7px; 
+		border-radius: 7px; 
+	}
+	progress::-moz-progress-bar,
+	progress::-webkit-progress-bar {
+		background: #b4823e;
+		border-radius: 5px;
+		-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+		-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	}
+	progress::-moz-progress-value,
+	progress::-webkit-progress-value {
+		-webkit-border-radius: 5px; 
+		-moz-border-radius: 5px; 
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+	progress::-webkit-progress-value {
+		background: #b4823e;
+	}
 
 /* Remove unnecessary elements on listing */
 .woocom-list-content .price .event_data-details .event_data-columns{

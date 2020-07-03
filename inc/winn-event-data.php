@@ -355,16 +355,26 @@ function data_eventos() {
 	;
 	if (!empty( $_live_evt )) {
 		echo 	"<div class='event_data-columns'>
-						<div class='event_data-col event_data-icon'>
-							<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
-						</div>
-						<div class='event_data-col event_data-text'>
-							<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
-							<span><a href='" . $_live_evt . "' class='btn' target='_blank'>Ir al stream</a></span>					
-						</div>
+					<div class='event_data-col event_data-icon'>
+						<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
+					</div>
+					<div class='event_data-col event_data-text'>
+						<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
+						<span><a href='" . $_live_evt . "' class='btn' target='_blank'>Ir al stream</a></span>					
 					</div>
 				</div>";
 	}
+	echo "
+				<div class='event_data-columns'>
+					<div class='event_data-col event_data-icon'>
+						<i class='fa fa-tachometer fa-2x' aria-hidden='true'></i>
+					</div>
+					<div class='event_data-col event_data-text'>
+						<h5 class='event_data-title'>" . __('Estatus de ocupación') . "</h5>
+						<progress id='progress2' max='100' value='50' style='margin:10px 0 0;' ></progress>
+					</div>
+				</div>
+			</div>";
 }
 add_action( 'woocommerce_single_product_summary', 'data_eventos' );
 add_action( 'woocommerce_process_product_meta', 'data_eventos' );
