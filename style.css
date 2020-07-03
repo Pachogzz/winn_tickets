@@ -166,22 +166,26 @@ div.product div.summary .price::after {
 		-moz-border-radius: 7px; 
 		border-radius: 7px; 
 	}
-	progress::-moz-progress-bar,
-	progress::-webkit-progress-bar {
-		background: #b4823e;
-		border-radius: 5px;
-		-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-		-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
-	}
-	progress::-moz-progress-value,
-	progress::-webkit-progress-value {
-		-webkit-border-radius: 5px; 
+	progress::-moz-progress-value {
 		-moz-border-radius: 5px; 
 		background-size: 35px 20px, 100% 100%, 100% 100%;
 	}
 	progress::-webkit-progress-value {
 		background: #b4823e;
+		-webkit-border-radius: 5px; 
+		background-size: 35px 20px, 100% 100%, 100% 100%;
+	}
+	progress::-moz-progress-bar {
+		background: #b4823e;
+		border-radius: 5px;
+		-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+	}
+	progress::-webkit-progress-bar {
+		background: #001a3e;
+		border-radius: 5px;
+		-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 	}
 
 /* Remove unnecessary elements on listing */
