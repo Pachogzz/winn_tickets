@@ -256,21 +256,6 @@ function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
 }
 add_filter( 'woocommerce_get_item_data', 'plugin_republic_get_item_data', 10, 2 );
 
-/**
- * Add custom cart item data to emails
- */
-// function plugin_republic_order_item_name( $product_name, $item ) {
-//     if( isset( $item['pr_field'] ) ) {
-//         $product_name .= sprintf(
-//             '<ul><li>%s: %s</li></ul>',
-//                 __( 'Your name', 'plugin_republic' ),
-//                 esc_html( $item['pr_field'] )
-//             );
-//     }
-//     return $product_name;
-//    }
-// add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );
-
 
 /**
 * Add custom field to the checkout page

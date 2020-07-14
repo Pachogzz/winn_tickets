@@ -325,6 +325,16 @@ add_action( 'woocommerce_process_product_meta_variable', 'save_eventodata'  );
  */
 function data_eventos() {
 
+	global $product;
+	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
+
+	foreach ($cantidadBoletos as $key => $value) {
+		$total += $value;
+	}
+	$comprados = $total - $product->stock_quantity;
+	$porcentaje = round($total * $product->stock_quantity / 100);
+
+
 	$_day_evt 		= get_post_meta( get_the_ID(), '_day-evento', true );
 	$_num_evt 		= get_post_meta( get_the_ID(), '_num-evento', true );
 	$_month_evt 	= get_post_meta( get_the_ID(), '_month-evento', true );
@@ -370,8 +380,8 @@ function data_eventos() {
 						<i class='fa fa-tachometer fa-2x' aria-hidden='true'></i>
 					</div>
 					<div class='event_data-col event_data-text'>
-						<h5 class='event_data-title'>" . __('Estatus de ocupación') . "</h5>
-						<progress id='progress2' max='100' value='50' style='margin:10px 0 0;' ></progress>
+						<h5 class='event_data-title'>" . __('Estatus de ocupación: ') . $porcentaje . "%</h5>
+						<progress id='progress2' max='". $total . "' value='". $comprados ."' style='margin:10px 0 0;' >3%</progress>
 					</div>
 				</div>
 			</div>";
