@@ -332,7 +332,12 @@ function data_eventos() {
 		$total += $value;
 	}
 	$comprados = $total - $product->stock_quantity;
-	$porcentaje = round($total * $product->stock_quantity / 100);
+
+	if($total != $product->stock_quantity){
+		$porcentaje = round($total * $product->stock_quantity / 100);	
+	}else{
+		$porcentaje = 0;
+	}
 
 
 	$_day_evt 		= get_post_meta( get_the_ID(), '_day-evento', true );
