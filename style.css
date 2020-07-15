@@ -73,6 +73,10 @@ ul.list-boletos li {
   position: relative;
 }
 
+ul.list-boletos li.nodisponible{
+	opacity: 0.2;
+}
+
 /* CSS for tickets icons ( substitution of checkboxes ) */
 #trigger[type=checkbox] {
 	display: none;
