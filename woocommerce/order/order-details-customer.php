@@ -61,3 +61,42 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
 
 </table>
 
+<?php 
+
+    $boletosComprados = get_post_meta($order->id, 'boletos_comprados', true);
+    $n = 0;
+
+    foreach ($boletosComprados as $c => $value) {
+        $boletos[$n]['boleto'] = $value;
+        $boletos[$n]["nombre"] =  get_post_meta($order->id, 'nombre-' . $value, true);
+        $boletos[$n]["apellido"] =  get_post_meta($order->id, 'apellido-' . $value, true);
+        $boletos[$n]["telefono"] =  get_post_meta($order->id, 'telefono-' . $value, true);
+        $boletos[$n]["correo"] =  get_post_meta($order->id, 'correo-' . $value, true);
+
+        $n++;
+    }
+
+?>
+<?php foreach($boletos as $b): ?>
+    <header style="margin-top: 50px;"><h4>Datos de boletos: <?php echo $b['boleto']; ?></h4></header>
+    <table class="shop_table customer_details">
+        <tbody>
+            <tr>
+                <td>Nombre:</td>
+                <td><?php echo $b['nombre']; ?></td>
+            </tr>
+            <tr>
+                <td>Apellido:</td>
+                <td><?php echo $b['apellido']; ?></td>
+            </tr>
+            <tr>
+                <td>Correo:</td>
+                <td><?php echo $b['correo']; ?></td>
+            </tr>
+            <tr>
+                <td>Teléfono:</td>
+                <td><?php echo $b['telefono']; ?></td>
+            </tr>
+        </tbody>
+    </table>
+<?php endforeach; ?>

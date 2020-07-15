@@ -1,5 +1,41 @@
 <?php
 
+function comprobarBoleto($boleto)
+{
+	$query = new WC_Order_Query( array(
+		'status' => 'completed',
+		'return' => 'ids',
+	) );
+	$orders = $query->get_orders();
+
+	$data = array();
+	$n = 0;
+
+	foreach ($orders as $id) {
+		$order = wc_get_order($id);
+
+		foreach ($order->get_items() as $item_key => $item ){
+
+			if($item->get_product_id() == get_the_ID()){
+				$boletosComprados = get_post_meta($id, 'boletos_comprados', true);
+
+				foreach ($boletosComprados as $bc => $value) {
+					$data[$n] = $value;
+					$n++;
+				}
+			}
+			
+		}
+	}
+
+	foreach ($data as $d) {
+		if($d == $boleto){
+			return true;
+		}
+	}
+
+}
+
 add_filter('woocommerce_product_data_tabs', 'boletos_product_settings_tabs' );
 function boletos_product_settings_tabs( $tabs ){
  
@@ -180,7 +216,9 @@ function tabs_boletos() {
 
 	$noBoletos = $product->stock_quantity / $boletosTabs;
 
+
 	global $woocommerce;
+
 	foreach ( $woocommerce->cart->get_cart() as $cart_item_key => $cart_item ) {
 
         if (!empty($cart_item['boleto'])) {
@@ -206,9 +244,9 @@ function tabs_boletos() {
 				<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $num ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $num ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $num ); ?>">
 					<ul class="list-boletos">
 						<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
-							<li>
-								<label><input id="trigger" type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
-							</li>
+								<li <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "class='nodisponible'"; } ?>>
+									<label><input id="trigger" type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "disabled"; } ?> /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
+								</li>
 						<?php endfor; ?>
 					</ul>
 				</div>
@@ -278,45 +316,49 @@ function custom_checkout_field($checkout){
 
 		echo '<div id="custom_checkout_field"><h4>' . __('Boleto') . " " . $boleto . '</h4>';
 
-			woocommerce_form_field('custom_field_name', array(
+			woocommerce_form_field('nombre-' . $boleto, array(
 				'type' => 'text',
 				'class' => array(
 					'my-field-class'
 					// 'my-field-class form-row-wide'
 				),
+				'required' => true,
 				'label' => __('Nombre')
 			),
-			$checkout->get_value('custom_field_name'));
+			$checkout->get_value('nombre-', $boleto));
 
-			woocommerce_form_field('custom_field_name', array(
+			woocommerce_form_field('apellido-' . $boleto, array(
 				'type' => 'text',
 				'class' => array(
 					'my-field-class'
 					// 'my-field-class form-row-wide'
 				),
+				'required' => true,
 				'label' => __('Apellido')
 			),
-			$checkout->get_value('custom_field_name'));
+			$checkout->get_value('apellido-', $boleto));
 
-			woocommerce_form_field('custom_field_name', array(
+			woocommerce_form_field('telefono-' . $boleto, array(
 				'type' => 'text',
 				'class' => array(
 					'my-field-class'
 					// 'my-field-class form-row-wide'
 				),
+				'required' => true,
 				'label' => __('Teléfono')
 			),
-			$checkout->get_value('custom_field_name'));
+			$checkout->get_value('telefono-', $boleto));
 
-			woocommerce_form_field('custom_field_name', array(
+			woocommerce_form_field('correo-' . $boleto, array(
 				'type' => 'text',
 				'class' => array(
 					'my-field-class'
 					// 'my-field-class form-row-wide'
 				),
+				'required' => true,
 				'label' => __('Correo')
 			),
-			$checkout->get_value('custom_field_name'));
+			$checkout->get_value('correo-', $boleto));
 
 		echo '</div>';
 
@@ -332,9 +374,40 @@ function custom_checkout_field($checkout){
 add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
 function custom_checkout_field_update_order_meta($order_id){
 
-	if (!empty($_POST['custom_field_name'])) {
-		update_post_meta($order_id, 'Some Field', sanitize_text_field($_POST['custom_field_name']));
+	global $woocommerce;
+	$items = $woocommerce->cart->get_cart();
+
+	foreach ($items as $key => $value) {
+		$boletos = $value['boleto'];
+		update_post_meta($order_id, "boletos_comprados", $value['boleto']);
 	}
+
+
+
+	foreach ($boletos as $boleto) {
+
+		// Guardar datos nombre
+		if (!empty($_POST['nombre-' . $boleto])) {
+			update_post_meta($order_id, 'nombre-' . $boleto, sanitize_text_field($_POST['nombre-' . $boleto]));
+		}
+
+		// Guardar datos Apellido
+		if (!empty($_POST['apellido-' . $boleto])) {
+			update_post_meta($order_id, 'apellido-' . $boleto, sanitize_text_field($_POST['apellido-' . $boleto]));
+		}
+
+		// Guardar datos Telefono
+		if (!empty($_POST['telefono-' . $boleto])) {
+			update_post_meta($order_id, 'telefono-' . $boleto, sanitize_text_field($_POST['telefono-' . $boleto]));
+		}
+
+		// Guardar datos Correo
+		if (!empty($_POST['correo-' . $boleto])) {
+			update_post_meta($order_id, 'correo-' . $boleto, sanitize_text_field($_POST['correo-' . $boleto]));
+		}
+	}
+
+	
 	
 }
 add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
