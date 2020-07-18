@@ -245,7 +245,7 @@ function tabs_boletos() {
 					<ul class="list-boletos">
 						<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
 								<li <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "class='nodisponible'"; } ?>>
-									<label><input id="trigger" type="checkbox" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "disabled"; } ?> /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
+									<label><input id="trigger" type="checkbox" class="boletoCheck" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "disabled"; } ?> /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
 								</li>
 						<?php endfor; ?>
 					</ul>
@@ -253,6 +253,28 @@ function tabs_boletos() {
 			<?php endforeach; ?>
 
 			<?php do_action( 'woocommerce_product_after_tabs' ); ?>
+
+			<script>
+				jQuery(function () {
+					jQuery(".single_add_to_cart_button").prop("disabled", true);
+					var sumar = 0;
+
+					jQuery('.boletoCheck').change(function() {
+						if (jQuery(this).prop('checked')) {
+							jQuery(".single_add_to_cart_button").prop("disabled", false);
+							sumar += 1;
+							jQuery('input[name=quantity]').val(sumar);
+						}
+						else {
+							sumar -= 1;
+							jQuery('input[name=quantity]').val(sumar);
+							if(sumar == 0){
+								jQuery(".single_add_to_cart_button").prop("disabled", true);
+							}
+						}
+					});
+				});
+			</script>
 
 		</div>
 
