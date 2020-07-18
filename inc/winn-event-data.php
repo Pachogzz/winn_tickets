@@ -263,14 +263,14 @@ function eventodata_panels(){
 				);
 
 				woocommerce_wp_textarea_input( array(
-					'id'                => '_location-evento',
-					'value'             => '',
+					'id'                => 'location-evento',
+					'value'             => $location_evento,
 					'label'             => 'Ubicación del evento:'
 				));
 
 				woocommerce_wp_text_input( array(
 					'id'                => '_live-evento',
-					'value'             => '',
+					'value'             => $live_evento ,
 					'label'             => 'Liga del livestream:'
 				));
 		echo '</span>
