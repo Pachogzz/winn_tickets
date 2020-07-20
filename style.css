@@ -55,7 +55,15 @@ Template: dt-the7
 	color: #fff !important;
 }
 
-/* Single Product */
+/* Single Product Columns */
+.product div.images{
+	width: 63%;
+}
+.product div.summary{
+	width: calc(100% - 68% - 0px) 
+}
+
+/* Single Product Ticket list */
 ul.list-boletos{
     list-style: none;
     margin-left: 0;
@@ -192,6 +200,18 @@ div.product div.summary .price::after {
 		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 	}
 
+/* Styling event date on event listing */
+.product_grid_data i{
+	color: #b4823e;
+}
+.product_grid_data span{
+	display: block;
+	width: 100%;
+	text-align: left;
+	font-size: 14px;
+	color: #999;
+}
+
 /* Remove unnecessary elements on listing */
 .woocom-list-content .price .event_data-details .event_data-columns{
 	overflow: inherit;
@@ -202,7 +222,7 @@ div.product div.summary .price::after {
 .woocom-list-content .entry-title a{
 	display: block;
 	width: 100%;
-	text-align: center;
+	text-align: left;
 }
 .woocom-list-content .price .event_data-details .event_data-col.event_data-icon,
 .woocom-list-content .price .event_data-details .event_data-col.event_data-text .event_data-title{

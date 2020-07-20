@@ -8,9 +8,9 @@ function my_remove_product_type_options( $options ) {
 		unset( $options['virtual'] );
 	}
 	// Downloable product checkbox
-	if ( isset( $options['downloadable'] ) ) {
-		unset( $options['downloadable'] );
-	}
+	// if ( isset( $options['downloadable'] ) ) {
+	// 	unset( $options['downloadable'] );
+	// }
 	return $options;
 }
 add_filter( 'product_type_options', 'my_remove_product_type_options' );

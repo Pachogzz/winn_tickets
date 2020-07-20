@@ -230,6 +230,7 @@ function tabs_boletos() {
 	}
 
 	?>
+	<div id='event_sections_tabs' style='margin:25px 0 0;'>
 		<div class="woocommerce-tabs wc-tabs-wrapper" style="margin-bottom:40px; border-bottom:1 px solid #000;">
 			<ul class="tabs wc-tabs" role="tablist">
 				<?php foreach($prefijoTabs as $num => $tab): ?>
@@ -277,12 +278,13 @@ function tabs_boletos() {
 			</script>
 
 		</div>
+	</div>
 
 	<?php
 }
 
-add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
-// add_action( 'woocommerce_after_single_product_summary', 'tabs_boletos');
+// add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
 
 
 

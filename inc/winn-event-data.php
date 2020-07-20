@@ -50,12 +50,12 @@ function eventodata_panels(){
 					'label'		=> 'Día del evento:',
 					'options'	=> array(
 								'Lunes'		=> __('Lunes', 'woocommerce'),
-								'Martes'		=> __('Martes', 'woocommerce'),
-								'Miércoles'		=> __('Miércoles', 'woocommerce'),
-								'Jueves'		=> __('Jueves', 'woocommerce'),
-								'Viernes'		=> __('Viernes', 'woocommerce'),
-								'Sabado'		=> __('Sabado', 'woocommerce'),
-								'Domingo'		=> __('Domingo', 'woocommerce'),
+								'Martes'	=> __('Martes', 'woocommerce'),
+								'Miércoles'	=> __('Miércoles', 'woocommerce'),
+								'Jueves'	=> __('Jueves', 'woocommerce'),
+								'Viernes'	=> __('Viernes', 'woocommerce'),
+								'Sabado'	=> __('Sabado', 'woocommerce'),
+								'Domingo'	=> __('Domingo', 'woocommerce'),
 						)
 					)
 				);
@@ -103,15 +103,15 @@ function eventodata_panels(){
 					'id'		=> '_month-evento',
 					'label'		=> 'Mes del evento:',
 					'options'	=> array(
-								'Enero'		=> __('Enero', 'woocommerce'),
+								'Enero'			=> __('Enero', 'woocommerce'),
 								'Febrero'		=> __('Febrero', 'woocommerce'),
-								'Marzo'		=> __('Marzo', 'woocommerce'),
-								'Abril'		=> __('Abril', 'woocommerce'),
-								'Mayo'		=> __('Mayo', 'woocommerce'),
-								'Junio'		=> __('Junio', 'woocommerce'),
-								'Julio'		=> __('Julio', 'woocommerce'),
+								'Marzo'			=> __('Marzo', 'woocommerce'),
+								'Abril'			=> __('Abril', 'woocommerce'),
+								'Mayo'			=> __('Mayo', 'woocommerce'),
+								'Junio'			=> __('Junio', 'woocommerce'),
+								'Julio'			=> __('Julio', 'woocommerce'),
 								'Agosto'		=> __('Agosto', 'woocommerce'),
-								'Septiembre'		=> __('Septiembre', 'woocommerce'),
+								'Septiembre'	=> __('Septiembre', 'woocommerce'),
 								'Octubre'		=> __('Octubre', 'woocommerce'),
 								'Noviembre0'	=> __('Noviembre', 'woocommerce'),
 								'Diciembre1'	=> __('Diciembre', 'woocommerce'),
@@ -397,8 +397,8 @@ add_action( 'woocommerce_process_product_meta', 'data_eventos' );
 /**
  * Change HTML layout of price tags
  */
-add_filter( 'woocommerce_get_price_html', 'bbloomer_add_price_prefix', 99, 2 ); 
-function bbloomer_add_price_prefix( $price, $product ){
+add_filter( 'woocommerce_get_price_html', 'event_add_title_price', 99, 2 ); 
+function event_add_title_price( $price, $product ){
     $price = '
 			<div id="event_data_details" class="event_data-details">
 				<div class="event_data-columns">
@@ -421,3 +421,31 @@ function event_add_price_suffix( $html, $product, $price, $qty ){
    	';
     return $html;
 }
+
+/**
+ * Add data "DATE" to prduct grid
+ */
+function event_add_data_date_product_grid (){
+	$_num_evt 		= get_post_meta( get_the_ID(), '_num-evento', true );
+	$_month_evt 	= get_post_meta( get_the_ID(), '_month-evento', true );
+	$_year_evt 		= get_post_meta( get_the_ID(), '_year-evento', true );
+	
+	echo "<div class='product_grid_data'>
+		<span><i class='fa fa-calendar' aria-hidden='true'></i> " . $_month_evt . " " . $_num_evt . ", " . $_year_evt . "</span>
+	</div>";
+}
+add_action('woocommerce_after_shop_loop_item','event_add_data_date_product_grid');
+
+/**
+ * TEST ELEMENT IN LEFT COLUMN
+ */
+// function test_element_left_column_product_single (){
+// 	// Add the related code here
+// 	echo "
+// 		  <div id='event_sections_tabs' style='border:1px solid blue;margin:25px 0 0;'>
+// 		  	<div style='width:100%;height:50px;background-color:#c00;color:#fff;text-align:center;padding:25px 0;'>
+// 		  		<span>Esto puede funcionar</span>
+// 		  	</div>
+// 		  </div>";
+// }
+// add_action('woocommerce_product_thumbnails_columns','test_element_left_column_product_single', 200, 1);
