@@ -339,7 +339,7 @@ function data_eventos() {
 		$porcentaje = 0;
 	}
 
-
+	$_url 			= get_stylesheet_directory_uri();
 	$_day_evt 		= get_post_meta( get_the_ID(), '_day-evento', true );
 	$_num_evt 		= get_post_meta( get_the_ID(), '_num-evento', true );
 	$_month_evt 	= get_post_meta( get_the_ID(), '_month-evento', true );
@@ -351,7 +351,8 @@ function data_eventos() {
 	echo 	"<div id='event_data_details' class='event_data-details'>
 				<div class='event_data-columns'>
 					<div class='event_data-col event_data-icon'>
-						<i class='fa fa-calendar fa-2x' aria-hidden='true'></i>
+						<!--i class='fa fa-calendar fa-2x' aria-hidden='true'></i-->
+						<img src='" . $_url . "/assets/img/icons/ticket-icon-date.png' alt=''>
 					</div>
 					<div class='event_data-col event_data-text'>
 						<h5 class='event_data-title'>" . __('Fecha del evento') . "</h5>
@@ -360,7 +361,8 @@ function data_eventos() {
 				</div>
 				<div class='event_data-columns'>
 					<div class='event_data-col event_data-icon'>
-						<i class='fa fa-map-marker fa-2x' aria-hidden='true'></i>
+						<!--i class='fa fa-map-marker fa-2x' aria-hidden='true'></i-->
+						<img src='" . $_url . "/assets/img/icons/ticket-icon-location.png' alt=''>
 					</div>
 					<div class='event_data-col event_data-text'>
 						<h5 class='event_data-title'>" . __('Ubicación') . "</h5>
@@ -371,7 +373,8 @@ function data_eventos() {
 	if (!empty( $_live_evt )) {
 		echo 	"<div class='event_data-columns'>
 					<div class='event_data-col event_data-icon'>
-						<i class='fa fa-video-camera fa-2x' aria-hidden='true'></i>
+						<!--i class='fa fa-video-camera fa-2x' aria-hidden='true'></i-->
+						<img src='" . $_url . "/assets/img/icons/ticket-icon-live.png' alt=''>
 					</div>
 					<div class='event_data-col event_data-text'>
 						<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
@@ -382,7 +385,8 @@ function data_eventos() {
 	echo "
 				<div class='event_data-columns'>
 					<div class='event_data-col event_data-icon'>
-						<i class='fa fa-tachometer fa-2x' aria-hidden='true'></i>
+						<!--i class='fa fa-tachometer fa-2x' aria-hidden='true'></i-->
+						<img src='" . $_url . "/assets/img/icons/ticket-icon-progress.png' alt=''>
 					</div>
 					<div class='event_data-col event_data-text'>
 						<h5 class='event_data-title'>" . __('Estatus de ocupación: ') . $porcentaje . "%</h5>
@@ -399,11 +403,13 @@ add_action( 'woocommerce_process_product_meta', 'data_eventos' );
  */
 add_filter( 'woocommerce_get_price_html', 'event_add_title_price', 99, 2 ); 
 function event_add_title_price( $price, $product ){
+	$_url 			= get_stylesheet_directory_uri();
     $price = '
 			<div id="event_data_details" class="event_data-details">
 				<div class="event_data-columns">
 					<div class="event_data-col event_data-icon">
-						<i class="fa fa-dollar fa-2x" aria-hidden="true"></i>
+						<!--i class="fa fa-dollar fa-2x" aria-hidden="true"></i-->
+						<img src="' . $_url . '/assets/img/icons/ticket-icon-price.png" alt="">
 					</div>
 					<div class="event_data-col event_data-text">
 						<h5 class="event_data-title">' . __('Costo por ticket') . '</h5>
