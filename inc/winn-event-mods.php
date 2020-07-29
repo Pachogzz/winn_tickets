@@ -7,10 +7,11 @@ function my_remove_product_type_options( $options ) {
 	if ( isset( $options['virtual'] ) ) {
 		unset( $options['virtual'] );
 	}
+    
 	// Downloable product checkbox
-	// if ( isset( $options['downloadable'] ) ) {
-	// 	unset( $options['downloadable'] );
-	// }
+	if ( isset( $options['downloadable'] ) ) {
+		unset( $options['downloadable'] );
+	}
 	return $options;
 }
 add_filter( 'product_type_options', 'my_remove_product_type_options' );
@@ -79,16 +80,3 @@ function bbloomer_save_name_fields( $customer_id ) {
     }
   
 }
-
-/**
- * Add Out of stock badage
- */
-add_action( 'woocommerce_before_shop_loop_item_title', 'bbloomer_display_sold_out_loop_woocommerce' );
- 
-function bbloomer_display_sold_out_loop_woocommerce() {
-    global $product;
- 
-    if ( !$product->is_in_stock() ) {
-        echo '<span class="out-stock-label">' . __( 'Out Of Stock', 'the7mk2' ) . '</span>';
-    }
-} 

@@ -283,8 +283,8 @@ function tabs_boletos() {
 	<?php
 }
 
-// add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
-add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
+add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+// add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
 
 
 
