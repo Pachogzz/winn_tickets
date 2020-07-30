@@ -86,6 +86,25 @@ ul.list-boletos li {
 ul.list-boletos li.nodisponible{
 	opacity: 0.2;
 }
+/* CSS Random button */
+#Random{
+	display: inline-block;
+	background-color: #b4823e;
+	color: #fff;
+	min-height: 38px;
+	padding: 0 18px;
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 38px;
+	font-family: "Roboto", Helvetica, Arial, Verdana, sans-serif;
+	font-weight: bolder;
+	word-wrap: normal;
+	cursor: pointer;
+	margin-left: 20px;
+}
+#Random:hover{
+	opacity: .8;
+}
 
 /* CSS for tickets icons ( substitution of checkboxes ) */
 #trigger[type=checkbox] {

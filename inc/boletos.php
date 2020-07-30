@@ -296,8 +296,63 @@ add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 // Boton Random
 function botonRandom(){
 ?>
+<<<<<<< HEAD
 	<a id="Random" style="margin-left:20px;">Random</a>
 	<script>  
+=======
+	<a id="Random">Random</a>
+	<script>
+		jQuery(function () {
+			jQuery("#Random").click(function() {
+				var maxAllowed = jQuery('input[name=quantity][type=number]').val();
+
+				console.log(maxAllowed);
+				
+				var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
+					return this;
+				});
+
+				jQuery(checkboxes).prop("checked", false);
+				jQuery(checkboxes).prop("disabled", false);
+				
+				while(maxAllowed--) {
+					var rand = Math.floor(Math.random() * checkboxes.length);
+					var checkbox = checkboxes.splice(rand, 1)[0];
+					jQuery(checkbox).prop("checked", true);
+				}
+				console.log(checkbox);
+			})
+		});
+	</script>
+<?php
+}
+add_action( 'woocommerce_before_add_to_cart_button', 'botonRandom' );
+
+
+
+/**
+ * Add custom cart item data
+ */
+function plugin_republic_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {	
+    if( isset( $_POST['boleto'] )){
+        $cart_item_data['boleto'] = $_POST['boleto'];
+    }
+    return $cart_item_data;
+}
+add_filter( 'woocommerce_add_cart_item_data', 'plugin_republic_add_cart_item_data', 10, 3);
+
+/**
+ * Add custom cart item data to cart
+ */
+function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
+
+    if( isset( $cart_item_data['boleto'])){
+
+        foreach ($cart_item_data['boleto'] as $boleto) {
+            $totalBoletos .= $boleto . ", ";
+        }
+
+        $item_data[] = array(
             'key' => __( 'Boleto'),
             'value' => $totalBoletos,
         );
