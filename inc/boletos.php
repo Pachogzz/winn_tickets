@@ -259,13 +259,13 @@ function tabs_boletos() {
 
 			<script>
 				jQuery(function () {
-					jQuery(".single_add_to_cart_button").prop("disabled", true);
+					// jQuery(".single_add_to_cart_button").prop("disabled", true);
 					var sumar = 0;
 					var boleto = [];
 
 					jQuery('.boletoCheck').change(function() {
 						if (jQuery(this).prop('checked')) {
-							jQuery(".single_add_to_cart_button").prop("disabled", false);
+							// jQuery(".single_add_to_cart_button").prop("disabled", false);
 							sumar += 1;
 							boleto.push(jQuery('.boletoCheck').val());
 							jQuery('input[name=quantity]').val(sumar);
