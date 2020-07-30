@@ -296,11 +296,7 @@ add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 // Boton Random
 function botonRandom(){
 ?>
-<<<<<<< HEAD
 	<a id="Random" style="margin-left:20px;">Random</a>
-	<script>  
-=======
-	<a id="Random">Random</a>
 	<script>
 		jQuery(function () {
 			jQuery("#Random").click(function() {
