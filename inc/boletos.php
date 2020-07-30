@@ -255,15 +255,19 @@ function tabs_boletos() {
 
 			<?php do_action( 'woocommerce_product_after_tabs' ); ?>
 
+
+
 			<script>
 				jQuery(function () {
 					jQuery(".single_add_to_cart_button").prop("disabled", true);
 					var sumar = 0;
+					var boleto = [];
 
 					jQuery('.boletoCheck').change(function() {
 						if (jQuery(this).prop('checked')) {
 							jQuery(".single_add_to_cart_button").prop("disabled", false);
 							sumar += 1;
+							boleto.push(jQuery('.boletoCheck').val());
 							jQuery('input[name=quantity]').val(sumar);
 						}
 						else {
@@ -274,6 +278,22 @@ function tabs_boletos() {
 							}
 						}
 					});
+
+					jQuery(".single_add_to_cart_button").click(function(){
+						jQuery.ajax({
+							data:  boleto, //datos que se envian a traves de ajax
+							url:   'http://localhost/winn_tickets/product/cross-contry-slp/', //archivo que recibe la peticion
+							type:  'post', //método de envio
+							beforeSend: function () {
+									// $("#resultado").html("Procesando, espere por favor...");
+									console.log(boleto);
+							},
+							success:  function (response) { //una vez que el archivo recibe el request lo procesa y lo devuelve
+									// $("#resultado").html(response);
+							}
+						});
+					});
+
 				});
 			</script>
 
@@ -283,26 +303,27 @@ function tabs_boletos() {
 	<?php
 }
 
-// add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
-add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
+add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
+// add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
 
 
 
 /**
  * Add custom cart item data
  */
-function plugin_republic_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
+function plugin_republic_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {	
     if( isset( $_POST['boleto'] )){
         $cart_item_data['boleto'] = $_POST['boleto'];
     }
     return $cart_item_data;
 }
-add_filter( 'woocommerce_add_cart_item_data', 'plugin_republic_add_cart_item_data', 10, 3 );
+add_filter( 'woocommerce_add_cart_item_data', 'plugin_republic_add_cart_item_data', 10, 3);
 
 /**
  * Add custom cart item data to cart
  */
 function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
+
     if( isset( $cart_item_data['boleto'])){
 
         foreach ($cart_item_data['boleto'] as $boleto) {
