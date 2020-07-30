@@ -300,13 +300,16 @@ function botonRandom(){
 	<script>
 		jQuery(function () {
 			jQuery("#Random").click(function() {
-				var maxAllowed = 1;
+				var maxAllowed = jQuery('input[name=quantity][type=number]').val();
+
+				console.log(maxAllowed);
 				
 				var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
 					return this;
 				});
 
 				jQuery(checkboxes).prop("checked", false);
+				jQuery(checkboxes).prop("disabled", false);
 				
 				while(maxAllowed--) {
 					var rand = Math.floor(Math.random() * checkboxes.length);
