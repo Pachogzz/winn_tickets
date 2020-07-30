@@ -57,10 +57,12 @@ Template: dt-the7
 
 /* Single Product Columns */
 .product div.images{
-	width: 63%;
+	width: 35%;
+	/*width: 63%;*/
 }
 .product div.summary{
-	width: calc(100% - 68% - 0px) 
+	width: calc(100% - 40% - -10px); 
+	/*width: calc(100% - 68% - 0px) */
 }
 
 /* Single Product Ticket list */
@@ -77,7 +79,7 @@ ul.list-boletos li{
 ul.list-boletos li {
   color: #000;
   margin-bottom: 15px;
-  width: 70px;
+  width: 80px;
   position: relative;
 }
 
@@ -90,29 +92,84 @@ ul.list-boletos li.nodisponible{
 	display: none;
 }
 #trigger[type=checkbox] + span {
-	text-align: center;
-	background-image: url(assets/img/ticket-icon-op1.png);
+	/*background-image: url(assets/img/ticket-icon-op1.png);
 	background-position: top center;
 	background-size: cover;
-	width: 69px;
-	height: 42px;
-	background-repeat: no-repeat;
+	background-repeat: no-repeat;*/
 	display: inline-block;
+	width: 70px;
+	height: 42px;
+	border: 5px solid #b4823e;
+	text-align: center;
 	line-height: 42px;
 	font-size: 14px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+}
+#trigger[type="checkbox"] + span::before,
+#trigger[type="checkbox"] + span::after{
+	content: "";
+	display: block;
+	position: absolute;
+	width: 0px;
+	height: 0px;
+	top: 50%;
+	margin-top: -5px;
+	border: 5px solid #fff;
+}
+#trigger[type="checkbox"] + span::before{
+	left: 0px;
+	border-right: 0;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+}
+#trigger[type="checkbox"] + span::after{
+	right: 0px;
+	border-left: 0;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
 }
 #trigger[type=checkbox]:checked + span {
 	padding: 0;
 	background-position: center center;
+	border: 5px solid #001a3e;
+}
+.nodisponible #trigger[type=checkbox] + span{
+	border: 5px solid #ccc;
 }
 
 /* CSS for event info on product page */
-.event_data-details{}
+#event_description{
+	display: block;
+	width: 100%;
+	margin: 25px auto;
+	float: initial;
+	clear: both;
+}
+.woocommerce div.product div.summary form.cart,
+.woocommerce div.product div.summary p.cart{
+	margin-bottom: 0px;
+}
+.event_data-details.first_part{
+	margin-top: 25px;
+}
+.event_data-details.second_part{}
 .event_data-details .event_data-columns{
 	overflow: hidden;
 	border-bottom: 1px solid #b4823e;
 	margin-bottom: 15px;
 	padding-bottom: 15px;
+}
+.event_data-details.second_part .event_data-columns{
+	width: 46%;
+	float: left;
+	min-height: 80px;
+}
+.event_data-details.second_part .event_data-columns:first-child{
+	margin-right: 3%;
 }
 .event_data-details .event_data-columns .event_data-col{
 	float: left;
@@ -130,8 +187,8 @@ ul.list-boletos li.nodisponible{
 	line-height: 4.3rem;
 }
 .event_data-details .event_data-icon img{
-	display: block;
-	width: 60px;
+	display: block !important;
+	width: 60px !important;
 	margin: 0 auto;
 }
 .event_data-details .event_data-title{
@@ -251,6 +308,7 @@ div.product div.summary .price::after {
 	border: 1px solid #b4823e;
 	padding: 6px 10px;
 	margin-left: 5px;
+	margin-bottom: 5px;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	-ms-border-radius: 4px;

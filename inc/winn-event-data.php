@@ -7,7 +7,8 @@ remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_p
 function woocommerce_template_product_description() {
   wc_get_template( 'single-product/tabs/description.php' );
 }
-add_action( 'woocommerce_product_meta_end', 'woocommerce_template_product_description', 20 );
+add_action( 'woocommerce_product_thumbnails_columns', 'woocommerce_template_product_description', 60 );
+// add_action( 'woocommerce_product_meta_end', 'woocommerce_template_product_description', 20 );
 
 /**
  * Event Data: Datos extra del Evento.
@@ -325,20 +326,6 @@ add_action( 'woocommerce_process_product_meta_variable', 'save_eventodata'  );
  */
 function data_eventos() {
 
-	global $product;
-	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
-
-	foreach ($cantidadBoletos as $key => $value) {
-		$total += $value;
-	}
-	$comprados = $total - $product->stock_quantity;
-
-	if($total != $product->stock_quantity){
-		$porcentaje = round($total * $product->stock_quantity / 100);	
-	}else{
-		$porcentaje = 0;
-	}
-
 	$_url 			= get_stylesheet_directory_uri();
 	$_day_evt 		= get_post_meta( get_the_ID(), '_day-evento', true );
 	$_num_evt 		= get_post_meta( get_the_ID(), '_num-evento', true );
@@ -348,7 +335,7 @@ function data_eventos() {
 	$_location_evt 	= get_post_meta( get_the_ID(), '_location-evento', true );
 	$_live_evt 		= get_post_meta( get_the_ID(), '_live-evento', true );
 
-	echo 	"<div id='event_data_details' class='event_data-details'>
+	echo 	"<div id='event_data_details' class='event_data-details first_part'>
 				<div class='event_data-columns'>
 					<div class='event_data-col event_data-icon'>
 						<!--i class='fa fa-calendar fa-2x' aria-hidden='true'></i-->
@@ -380,20 +367,10 @@ function data_eventos() {
 						<h5 class='event_data-title'>" . __('Liga al livestream') . "</h5>
 						<span><a href='" . $_live_evt . "' class='btn' target='_blank'>Ir al stream</a></span>					
 					</div>
-				</div>";
-	}
-	echo "
-				<div class='event_data-columns'>
-					<div class='event_data-col event_data-icon'>
-						<!--i class='fa fa-tachometer fa-2x' aria-hidden='true'></i-->
-						<img src='" . $_url . "/assets/img/icons/ticket-icon-progress.png' alt=''>
-					</div>
-					<div class='event_data-col event_data-text'>
-						<h5 class='event_data-title'>" . __('Estatus de ocupación: ') . $porcentaje . "%</h5>
-						<progress id='progress2' max='". $total . "' value='". $comprados ."' style='margin:10px 0 0;' >3%</progress>
-					</div>
 				</div>
 			</div>";
+	}
+	
 }
 add_action( 'woocommerce_single_product_summary', 'data_eventos' );
 add_action( 'woocommerce_process_product_meta', 'data_eventos' );
@@ -403,9 +380,35 @@ add_action( 'woocommerce_process_product_meta', 'data_eventos' );
  */
 add_filter( 'woocommerce_get_price_html', 'event_add_title_price', 99, 2 ); 
 function event_add_title_price( $price, $product ){
+
+	global $product;
+	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
+
+	foreach ($cantidadBoletos as $key => $value) {
+		$total += $value;
+	}
+	$comprados = $total - $product->stock_quantity;
+
+	if($total != $product->stock_quantity){
+		$porcentaje = round($total * $product->stock_quantity / 1000);	
+	}else{
+		$porcentaje = 0;
+	}
 	$_url 			= get_stylesheet_directory_uri();
+
+	echo "<div id='event_data_details' class='event_data-details second_part'>
+			<div class='event_data-columns'>
+				<div class='event_data-col event_data-icon'>
+					<!--i class='fa fa-tachometer fa-2x' aria-hidden='true'></i-->
+					<img src='" . $_url . "/assets/img/icons/ticket-icon-progress.png' alt=''>
+				</div>
+				<div class='event_data-col event_data-text'>
+					<h5 class='event_data-title'>" . __('Estatus de ocupación: ') . $porcentaje . "%</h5>
+					<progress id='progress2' max='". $total . "' value='". $comprados ."' style='margin:10px 0 0;' ></progress>
+				</div>
+			</div>";
+    
     $price = '
-			<div id="event_data_details" class="event_data-details">
 				<div class="event_data-columns">
 					<div class="event_data-col event_data-icon">
 						<!--i class="fa fa-dollar fa-2x" aria-hidden="true"></i-->
@@ -417,6 +420,7 @@ function event_add_title_price( $price, $product ){
     ' . $price;
     return $price;
 }
+
 add_filter( 'woocommerce_get_price_suffix', 'event_add_price_suffix', 99, 4 );
 function event_add_price_suffix( $html, $product, $price, $qty ){
     $html .= '
@@ -441,17 +445,3 @@ function event_add_data_date_product_grid (){
 	</div>";
 }
 add_action('woocommerce_after_shop_loop_item','event_add_data_date_product_grid');
-
-/**
- * TEST ELEMENT IN LEFT COLUMN
- */
-// function test_element_left_column_product_single (){
-// 	// Add the related code here
-// 	echo "
-// 		  <div id='event_sections_tabs' style='border:1px solid blue;margin:25px 0 0;'>
-// 		  	<div style='width:100%;height:50px;background-color:#c00;color:#fff;text-align:center;padding:25px 0;'>
-// 		  		<span>Esto puede funcionar</span>
-// 		  	</div>
-// 		  </div>";
-// }
-// add_action('woocommerce_product_thumbnails_columns','test_element_left_column_product_single', 200, 1);
