@@ -279,21 +279,6 @@ function tabs_boletos() {
 						}
 					});
 
-					jQuery(".single_add_to_cart_button").click(function(){
-						jQuery.ajax({
-							data:  boleto, //datos que se envian a traves de ajax
-							url:   'http://localhost/winn_tickets/product/cross-contry-slp/', //archivo que recibe la peticion
-							type:  'post', //método de envio
-							beforeSend: function () {
-									// $("#resultado").html("Procesando, espere por favor...");
-									console.log(boleto);
-							},
-							success:  function (response) { //una vez que el archivo recibe el request lo procesa y lo devuelve
-									// $("#resultado").html(response);
-							}
-						});
-					});
-
 				});
 			</script>
 
@@ -305,6 +290,36 @@ function tabs_boletos() {
 
 add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 // add_action( 'woocommerce_product_thumbnails_columns', 'tabs_boletos', 200, 1);
+
+
+
+// Boton Random
+function botonRandom(){
+?>
+	<a id="Random" style="margin-left:20px;">Random</a>
+	<script>
+		jQuery(function () {
+			jQuery("#Random").click(function() {
+				var maxAllowed = 1;
+				
+				var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
+					return this;
+				});
+
+				jQuery(checkboxes).prop("checked", false);
+				
+				while(maxAllowed--) {
+					var rand = Math.floor(Math.random() * checkboxes.length);
+					var checkbox = checkboxes.splice(rand, 1)[0];
+					jQuery(checkbox).prop("checked", true);
+				}
+				console.log(checkbox);
+			})
+		});
+	</script>
+<?php
+}
+add_action( 'woocommerce_before_add_to_cart_button', 'botonRandom' );
 
 
 
