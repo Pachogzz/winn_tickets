@@ -3,5 +3,6 @@ jQuery(document).ready(function(){
 	jQuery("#event_data_details.first_part").appendTo(".single-product .woocommerce-product-gallery");
 	jQuery("#event_description").appendTo("#event_data_details.first_part");
 	jQuery("#event_sections_tabs").insertAfter(".single_add_to_cart_button");
+	jQuery(".switcher-wrap .view-mode-switcher").remove();
 });
 

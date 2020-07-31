@@ -89,3 +89,42 @@ function bbloomer_save_name_fields( $customer_id ) {
     }
   
 }
+
+/*
+ * Fix for styles on prices on product list on admin for woocommerce
+ */
+add_action('admin_head', 'custom_css_fix');
+function custom_css_fix() {
+  echo '<style>
+    .wp-list-table .type-product .price.column-price{
+        /*border: 1px solid red;*/
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details .admin-none{
+        /*border: 1px solid blue;*/
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details #event_data_details{
+        /*border: 1px solid green;*/
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details #event_data_details .event_data-columns:last-child{
+        /*border: 3px solid purple;*/
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details #event_data_details .event_data-columns:last-child .event_data-col:first-child{
+        /*border: 3px solid orange;*/
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details #event_data_details .event_data-columns:last-child .event_data-col:last-child{
+        /*border: 3px solid pink;*/
+    }
+    .wp-list-table .type-product .price.column-price #event_data_details #event_data_details .event_data-columns:last-child .event_data-col:last-child .event_data-title{
+        /*border: 3px solid lightblue;*/
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
+  </style>';
+}
