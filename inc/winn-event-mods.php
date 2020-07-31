@@ -17,6 +17,15 @@ function my_remove_product_type_options( $options ) {
 add_filter( 'product_type_options', 'my_remove_product_type_options' );
 
 /*
+ * Disable Download Tab from user my account page
+ */
+add_filter( 'woocommerce_account_menu_items', 'remove_downloads_my_account', 999 );
+function remove_downloads_my_account( $items ) {
+    unset($items['downloads']);
+    return $items;
+}
+
+/*
  * Disable autologin when create an new account
  */
 add_filter( 'woocommerce_registration_auth_new_customer', '__return_false' );
