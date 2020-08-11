@@ -353,124 +353,31 @@ function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
             'value' => $totalBoletos,
         );
     }
-    return $item_data;
+	return $item_data;
 }
 add_filter( 'woocommerce_get_item_data', 'plugin_republic_get_item_data', 10, 2 );
 
 
 /**
-* Add custom field to the checkout page
-*/
+ * Add custom cart item data to emails
+ */
+function plugin_republic_order_item_name( $product_name, $item ) {
 
-add_action('woocommerce_before_checkout_billing_form', 'custom_checkout_field');
-// add_action('woocommerce_after_order_notes', 'custom_checkout_field');
-function custom_checkout_field($checkout){
+	if( isset( $item['boletos'] ) ) {
 
-	global $woocommerce;
-	$items = $woocommerce->cart->get_cart();
+		foreach ($item['boletos'] as $boleto) {
+			$boletos .= $boleto . ", ";
+		}
 
-	foreach ($items as $key => $value) {
-		$boletos = $value['boleto'];
+		$product_name .= sprintf(
+			'<ul><li>%s: %s</li></ul>',
+			__( 'Boleto(s)'),
+			esc_html( $boletos )
+		);
 	}
 
-	echo "<div class='checkout_page-ticketforms'>"; // added by pacho
-
-	foreach ($boletos as $boleto) {
-
-		echo '<div id="custom_checkout_field"><h4>' . __('Boleto') . " " . $boleto . '</h4>';
-
-			woocommerce_form_field('nombre-' . $boleto, array(
-				'type' => 'text',
-				'class' => array(
-					'my-field-class'
-					// 'my-field-class form-row-wide'
-				),
-				'required' => true,
-				'label' => __('Nombre')
-			),
-			$checkout->get_value('nombre-', $boleto));
-
-			woocommerce_form_field('apellido-' . $boleto, array(
-				'type' => 'text',
-				'class' => array(
-					'my-field-class'
-					// 'my-field-class form-row-wide'
-				),
-				'required' => true,
-				'label' => __('Apellido')
-			),
-			$checkout->get_value('apellido-', $boleto));
-
-			woocommerce_form_field('telefono-' . $boleto, array(
-				'type' => 'text',
-				'class' => array(
-					'my-field-class'
-					// 'my-field-class form-row-wide'
-				),
-				'required' => true,
-				'label' => __('Teléfono')
-			),
-			$checkout->get_value('telefono-', $boleto));
-
-			woocommerce_form_field('correo-' . $boleto, array(
-				'type' => 'text',
-				'class' => array(
-					'my-field-class'
-					// 'my-field-class form-row-wide'
-				),
-				'required' => true,
-				'label' => __('Correo')
-			),
-			$checkout->get_value('correo-', $boleto));
-
-		echo '</div>';
-
-	}
-
-	echo "</div>"; // added by pacho
+	return $product_name;
 
 }
-
-/**
-* Update the value given in custom field
-*/
-add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
-function custom_checkout_field_update_order_meta($order_id){
-
-	global $woocommerce;
-	$items = $woocommerce->cart->get_cart();
-
-	foreach ($items as $key => $value) {
-		$boletos = $value['boleto'];
-		update_post_meta($order_id, "boletos_comprados", $value['boleto']);
-	}
-
-
-
-	foreach ($boletos as $boleto) {
-
-		// Guardar datos nombre
-		if (!empty($_POST['nombre-' . $boleto])) {
-			update_post_meta($order_id, 'nombre-' . $boleto, sanitize_text_field($_POST['nombre-' . $boleto]));
-		}
-
-		// Guardar datos Apellido
-		if (!empty($_POST['apellido-' . $boleto])) {
-			update_post_meta($order_id, 'apellido-' . $boleto, sanitize_text_field($_POST['apellido-' . $boleto]));
-		}
-
-		// Guardar datos Telefono
-		if (!empty($_POST['telefono-' . $boleto])) {
-			update_post_meta($order_id, 'telefono-' . $boleto, sanitize_text_field($_POST['telefono-' . $boleto]));
-		}
-
-		// Guardar datos Correo
-		if (!empty($_POST['correo-' . $boleto])) {
-			update_post_meta($order_id, 'correo-' . $boleto, sanitize_text_field($_POST['correo-' . $boleto]));
-		}
-	}
-
-	
-	
-}
-// add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );
+   
+add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );

@@ -478,3 +478,7 @@ div.product div.summary .price::after {
 		width: 100%;
 	}
 }
+
+body.woocommerce-cart input.plus, body.woocommerce-cart input.minus{
+	display: none;
+}
