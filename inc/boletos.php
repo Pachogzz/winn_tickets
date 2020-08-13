@@ -381,3 +381,30 @@ function plugin_republic_order_item_name( $product_name, $item ) {
 }
    
 add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );
+
+
+// Se bloquea el quantity
+add_filter( 'woocommerce_cart_item_quantity', 'wc_cart_item_quantity', 10, 3 );
+function wc_cart_item_quantity( $product_quantity, $cart_item_key, $cart_item ){
+    if( is_cart() ){
+        $product_quantity = sprintf( '%2$s <input type="hidden" name="cart[%1$s][qty]" value="%2$s" />', $cart_item_key, $cart_item['quantity'] );
+    }
+    return $product_quantity;
+}
+
+
+// Add class
+function my_callback( $order ) {
+
+	if($order->get_status() == "completed"){
+		echo '<span class="badge badge-success">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
+	}
+
+	if($order->get_status() == "cancelled"){
+		echo '<span class="badge badge-danger">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
+	}
+
+	echo " Class=" . $order->get_status();
+
+}
+add_action( 'woocommerce_my_account_my_orders_column_order-status', 'my_callback', 10, 1 );

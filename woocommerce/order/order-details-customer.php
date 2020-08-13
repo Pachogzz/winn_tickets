@@ -77,25 +77,13 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
     }
 
 ?>
+<header style="margin-top: 50px;"><h4>Datos de boletos</h4></header>
 <?php foreach($boletos as $b): ?>
-    <header style="margin-top: 50px;"><h4>Datos de boletos: <?php echo $b['boleto']; ?></h4></header>
     <table class="shop_table customer_details">
         <tbody>
             <tr>
-                <td>Nombre:</td>
-                <td><?php echo $b['nombre']; ?></td>
-            </tr>
-            <tr>
-                <td>Apellido:</td>
-                <td><?php echo $b['apellido']; ?></td>
-            </tr>
-            <tr>
-                <td>Correo:</td>
-                <td><?php echo $b['correo']; ?></td>
-            </tr>
-            <tr>
-                <td>Teléfono:</td>
-                <td><?php echo $b['telefono']; ?></td>
+                <td>Boleto comprado:</td>
+                <td><?php echo $b['boleto']; ?></td>
             </tr>
         </tbody>
     </table>
