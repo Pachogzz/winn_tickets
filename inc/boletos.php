@@ -61,7 +61,7 @@ function boletos_product_panels(){
 	$boletosTabs = $boletosTabs +1;
 
 	$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
-	$prefijoBoletos = get_powst_meta( get_the_ID(), 'prefijo_boletos', true );
+	$prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
 	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
 
 	$stock = get_post_meta( get_the_ID(), '_stock', true );
