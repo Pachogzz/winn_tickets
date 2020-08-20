@@ -396,15 +396,35 @@ function wc_cart_item_quantity( $product_quantity, $cart_item_key, $cart_item ){
 // Add class
 function my_callback( $order ) {
 
+	if($order->get_status() == "on-hold"){
+		echo '<span class="badge badge-hold">' . __( 'En espera', 'winn' ) . '</span>';
+	}
+
 	if($order->get_status() == "completed"){
-		echo '<span class="badge badge-success">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
+		echo '<span class="badge badge-completed">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
 	}
 
 	if($order->get_status() == "cancelled"){
-		echo '<span class="badge badge-danger">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
+		echo '<span class="badge badge-cancelled">' . esc_html( wc_get_order_status_name( $order->get_status() ) ) . '</span>';
 	}
 
-	echo " Class=" . $order->get_status();
+	if($order->get_status() == "pending"){
+		echo '<span class="badge badge-pending">' . __( 'Pendiente de pago', 'winn' ) . '</span>';
+	}
+
+	if($order->get_status() == "processing"){
+		echo '<span class="badge badge-processing">' . __( 'Procesando', 'winn' ) . '</span>';
+	}
+
+	if($order->get_status() == "refund"){
+		echo '<span class="badge badge-refund">' . __( 'Devolución', 'winn' ) . '</span>';
+	}
+
+	if($order->get_status() == "failed"){
+		echo '<span class="badge badge-failed">' . __( 'Error', 'winn' ) . '</span>';
+	}
+
+	// echo "<small> class=" . $order->get_status() . "</small>";
 
 }
 add_action( 'woocommerce_my_account_my_orders_column_order-status', 'my_callback', 10, 1 );

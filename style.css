@@ -409,6 +409,48 @@ div.product div.summary .price::after {
 	margin-right: 2%;
 }
 
+/* Order Status clors */
+.badge{
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+.badge-hold{
+	color: #383d41;
+	background-color: #e2e3e5;
+	border-color: #d6d8db;
+}
+.badge-completed{
+	color: #155724;
+	background-color: #d4edda;
+	border-color: #c3e6cb;
+}
+.badge-cancelled{
+	color: #721c24;
+	background-color: #f8d7da;
+	border-color: #f5c6cb;
+}
+.badge-pending{
+	color: #856404;
+	background-color: #fff3cd;
+	border-color: #ffeeba;
+}
+.badge-processing{
+	color: #0c5460;
+	background-color: #d1ecf1;
+	border-color: #bee5eb;
+}
+.badge-refund{
+	color: #aa5f00;
+	background-color: #ffc200;
+	border-color: #ffeeba;
+}
+.badge-failed{
+	color: #f8d7da;
+	background-color: #cc0000;
+	border-color: #721c24;
+}
+
 /* Responsiveness */
 @media only screen and (max-width : 320px){
 	.product div.images{
