@@ -451,6 +451,41 @@ div.product div.summary .price::after {
 	border-color: #721c24;
 }
 
+/* Notas para el cliente */
+.commentlist.notes{
+	background-color: #f7f7f7;
+	margin: 0 0 15px;
+	padding: 25px;
+	list-style: none;
+}
+.commentlist.notes .comment.note{
+	margin-bottom: 10px;
+}
+.commentlist.notes .comment.note .comment_container .comment-text .meta{
+	border-bottom: 1px solid #001a3e;
+	padding: 5px 10px 5px 0;
+	color: #001a3e;
+	font-weight: 500;
+	text-transform: capitalize;
+	position: relative;
+}
+.commentlist.notes .comment.note .comment_container .comment-text .description{
+	background-color: #ddbb8c42;
+	padding: 5px 10px;
+	color: #333;
+	position: relative;
+}
+.commentlist.notes .comment.note .comment_container .comment-text .description:before{
+	content: "";
+	display: block;
+	position: absolute;
+	top: 8px;
+	left: 0;
+	border-left: 6px solid #f7f7f7;
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent;
+}
+
 /* Responsiveness */
 @media only screen and (max-width : 320px){
 	.product div.images{
