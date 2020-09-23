@@ -559,3 +559,7 @@ div.product div.summary .price::after {
 body.woocommerce-cart input.plus, body.woocommerce-cart input.minus{
 	display: none;
 }
+
+#page .quantity .plus, #page .quantity .minus{
+	display: none;
+}

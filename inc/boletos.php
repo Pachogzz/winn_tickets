@@ -297,26 +297,25 @@ add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 function botonRandom(){
 ?>
 	<a id="Random" style="margin-left:20px;">Random</a>
+	<!-- <div class="boletosrandom"></div> -->
 	<script>
 		jQuery(function () {
 			jQuery("#Random").click(function() {
 				var maxAllowed = jQuery('input[name=quantity][type=number]').val();
-
-				console.log(maxAllowed);
 				
 				var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
 					return this;
 				});
 
 				jQuery(checkboxes).prop("checked", false);
-				jQuery(checkboxes).prop("disabled", false);
+				jQuery(checkboxes).prop("disabled", true);
 				
 				while(maxAllowed--) {
 					var rand = Math.floor(Math.random() * checkboxes.length);
+					console.log(checkboxes.length);
 					var checkbox = checkboxes.splice(rand, 1)[0];
 					jQuery(checkbox).prop("checked", true);
 				}
-				console.log(checkbox);
 			})
 		});
 	</script>
