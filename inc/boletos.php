@@ -5,7 +5,8 @@ function comprobarBoleto($boleto)
 	$query = new WC_Order_Query( array(
 		'status' => 'completed',
 		'return' => 'ids',
-	) );
+	));
+
 	$orders = $query->get_orders();
 
 	$data = array();
@@ -357,29 +358,29 @@ function plugin_republic_get_item_data( $item_data, $cart_item_data ) {
 add_filter( 'woocommerce_get_item_data', 'plugin_republic_get_item_data', 10, 2 );
 
 
-/**
- * Add custom cart item data to emails
- */
-function plugin_republic_order_item_name( $product_name, $item ) {
+// /**
+//  * Add custom cart item data to emails
+//  */
+// function plugin_republic_order_item_name( $product_name, $item ) {
 
-	if( isset( $item['boletos'] ) ) {
+// 	if( isset( $item['boletos'] ) ) {
 
-		foreach ($item['boletos'] as $boleto) {
-			$boletos .= $boleto . ", ";
-		}
+// 		foreach ($item['boletos'] as $boleto) {
+// 			$boletos .= $boleto . ", ";
+// 		}
 
-		$product_name .= sprintf(
-			'<ul><li>%s: %s</li></ul>',
-			__( 'Boleto(s)'),
-			esc_html( $boletos )
-		);
-	}
+// 		$product_name .= sprintf(
+// 			'<ul><li>%s: %s</li></ul>',
+// 			__( 'Boleto(s)'),
+// 			esc_html( $boletos )
+// 		);
+// 	}
 
-	return $product_name;
+// 	return $product_name;
 
-}
+// }
    
-add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );
+// add_filter( 'woocommerce_order_item_name', 'plugin_republic_order_item_name', 10, 2 );
 
 
 // Se bloquea el quantity
@@ -427,3 +428,20 @@ function my_callback( $order ) {
 
 }
 add_action( 'woocommerce_my_account_my_orders_column_order-status', 'my_callback', 10, 1 );
+
+/**
+* Update the value given in custom field
+*/
+add_action('woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta');
+function custom_checkout_field_update_order_meta($order_id){
+
+	global $woocommerce;
+	$items = $woocommerce->cart->get_cart();
+
+	foreach ($items as $key => $value) {
+		$boletos = $value['boleto'];
+		update_post_meta($order_id, "boletos_comprados", $value['boleto']);
+	}	
+	
+}
+// add_action( 'woocommerce_add_order_item_meta', 'tshirt_order_meta_handler', 1, 3 );

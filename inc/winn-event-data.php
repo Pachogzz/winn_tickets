@@ -388,12 +388,44 @@ function datosevento_settings_tabs( $tabs ){
 add_filter( 'woocommerce_get_price_html', 'event_add_title_price', 99, 2 ); 
 function event_add_title_price( $price, $product ){
 
-	global $product;
-	$cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
+	// global $product;
+	// $cantidadBoletos = get_post_meta( get_the_ID(), 'cantidad_boletos', true );
 
-	foreach ($cantidadBoletos as $key => $value) {
-		$total += $value;
+	// foreach ($cantidadBoletos as $key => $value) {
+	// 	$total += $value;
+	// }
+
+
+	$query = new WC_Order_Query( array(
+		'status' => 'completed',
+		'return' => 'ids',
+	));
+
+	$orders = $query->get_orders();
+
+	$data = array();
+	$n = 0;
+
+	foreach ($orders as $id) {
+		$order = wc_get_order($id);
+
+		foreach ($order->get_items() as $item_key => $item ){
+
+			if($item->get_product_id() == get_the_ID()){
+				$boletosComprados = get_post_meta($id, 'boletos_comprados', true);
+
+				foreach ($boletosComprados as $bc => $value) {
+					$data[$n] = $value;
+					$n++;
+				}
+			}
+			
+		}
 	}
+
+	$total = count($data);
+
+
 	$comprados = $total - $product->stock_quantity;
 
 	if($total != $product->stock_quantity){
@@ -401,7 +433,8 @@ function event_add_title_price( $price, $product ){
 	}else{
 		$porcentaje = 0;
 	}
-	$_url 			= get_stylesheet_directory_uri();
+
+	$_url = get_stylesheet_directory_uri();
 
 	echo "<div id='event_data_details' class='event_data-details second_part'>
 			<div class='event_data-columns admin-none'>
