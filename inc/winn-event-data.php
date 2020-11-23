@@ -424,12 +424,15 @@ function event_add_title_price( $price, $product ){
 	}
 
 	$total = count($data);
-
-
-	$comprados = $total - $product->stock_quantity;
+	$cantidad = $total + $product->stock_quantity;
+	$comprados = $cantidad - $product->stock_quantity;
 
 	if($total != $product->stock_quantity){
-		$porcentaje = round($total * $product->stock_quantity / 100);	
+		// $porcentaje = round($comprados * $total / 100);	
+		$porcentaje = $cantidad / $product->stock_quantity;
+		$porcentaje = $porcentaje * 100;
+		$porcentaje = round($porcentaje - 100);
+
 	}else{
 		$porcentaje = 0;
 	}
@@ -444,7 +447,7 @@ function event_add_title_price( $price, $product ){
 				</div>
 				<div class='event_data-col event_data-text'>
 					<h5 class='event_data-title'>" . __('Estatus de ocupación: ') . $porcentaje . "%</h5>
-					<progress id='progress2' max='". $total . "' value='". $comprados ."' style='margin:10px 0 0;' ></progress>
+					<progress id='progress2' max='". $cantidad . "' value='". $comprados ."' style='margin:10px 0 0;' ></progress>
 				</div>
 			</div>";
     
