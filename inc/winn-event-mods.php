@@ -22,6 +22,7 @@ add_filter( 'product_type_options', 'my_remove_product_type_options' );
 add_filter( 'woocommerce_account_menu_items', 'remove_downloads_my_account', 999 );
 function remove_downloads_my_account( $items ) {
     unset($items['downloads']);
+    unset($items['edit-address']);
     return $items;
 }
 
