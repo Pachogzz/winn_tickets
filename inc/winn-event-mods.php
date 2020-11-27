@@ -235,3 +235,12 @@ function winn_separate_registration_form() {
      
    return ob_get_clean();
 }
+
+/**
+ * Redirect after logout
+ */
+add_action('wp_logout','auto_redirect_after_logout');
+function auto_redirect_after_logout(){
+  wp_redirect( home_url() );
+  exit();
+}
