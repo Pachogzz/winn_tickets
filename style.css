@@ -24,10 +24,13 @@ Template: dt-the7
 }
 
 /*Show hide dashboard icon on menu bar*/
+.logged-in  .goto-register-account,
+.logged-in  .goto-register-account a,
 .goto-dashboard,
 .goto-dashboard a{
 	display: none !important;
 }
+.logged-in  .goto-register-account a .menu-item-text i.underline,
 .goto-dashboard a .menu-item-text i.underline{
 	display: none;
 	opacity: 0;
