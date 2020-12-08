@@ -436,8 +436,6 @@ function event_add_title_price( $price, $product ){
 		$porcentaje = 0;
 	}
 
-	var_dump($cantidad);
-
 	$_url = get_stylesheet_directory_uri();
 
 	echo "<div id='event_data_details' class='event_data-details second_part'>
