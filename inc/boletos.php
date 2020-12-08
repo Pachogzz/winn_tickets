@@ -58,8 +58,13 @@ add_action( 'woocommerce_product_data_panels', 'boletos_product_panels' );
 function boletos_product_panels(){
 
 
-	$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
-	$boletosTabs = $boletosTabs +1;
+	if(get_post_meta( get_the_ID(), 'boletos_tabs', true )){
+		$boletosTabs = get_post_meta( get_the_ID(), 'boletos_tabs', true );
+		$boletosTabs = $boletosTabs + 1;
+	}else{
+		$boletosTabs = 0;
+	}
+
 
 	$prefijoTabs = get_post_meta( get_the_ID(), 'prefijo_tabs', true );
 	$prefijoBoletos = get_post_meta( get_the_ID(), 'prefijo_boletos', true );
@@ -68,6 +73,7 @@ function boletos_product_panels(){
 	$stock = get_post_meta( get_the_ID(), '_stock', true );
 	$cantidadTotal = "";
 	$suma = 0;
+
 
 	foreach ($cantidadBoletos as $key => $value) {
 		$suma += $value;

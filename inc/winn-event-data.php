@@ -424,18 +424,19 @@ function event_add_title_price( $price, $product ){
 	}
 
 	$total = count($data);
+
 	$cantidad = $total + $product->stock_quantity;
 	$comprados = $cantidad - $product->stock_quantity;
 
 	if($total != $product->stock_quantity){
-		// $porcentaje = round($comprados * $total / 100);	
-		$porcentaje = $cantidad / $product->stock_quantity;
-		$porcentaje = $porcentaje * 100;
-		$porcentaje = round($porcentaje - 100);
+		$porcentaje = ((float)$comprados * 100) / $cantidad; // Regla de tres
+    	$porcentaje = round($porcentaje, 0);  // Quitar los decimales
 
 	}else{
 		$porcentaje = 0;
 	}
+
+	var_dump($cantidad);
 
 	$_url = get_stylesheet_directory_uri();
 
