@@ -555,6 +555,22 @@ div.product div.summary .price::after {
 	border-bottom: 10px solid transparent;
 }
 
+/* Carrito de compras */
+.woocommerce-cart-wrap td.product-remove{}
+.woocommerce-cart-wrap a.remove{}
+.woocommerce-cart-wrap a.remove i{}
+.woocommerce-cart-wrap a.remove i::before{
+	content: "\f057";
+	font-style: normal;
+	font-weight: 400;
+	font-variant: normal;
+	text-transform: none;
+	line-height: inherit;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-family: 'Font Awesome 5 Free';
+}
+
 /* Responsiveness */
 @media only screen and (max-width : 320px){
 	.product div.images{

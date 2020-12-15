@@ -345,7 +345,7 @@ function datosevento_settings_tabs( $tabs ){
 		echo 	"<div id='event_data_details' class='event_data-details first_part'>
 					<div class='event_data-columns'>
 						<div class='event_data-col event_data-icon'>
-							<!--i class='fa fa-calendar fa-2x' aria-hidden='true'></i-->
+							<!--i class='fas fa-calendar fa-2x' aria-hidden='true'></i-->
 							<img src='" . $_url . "/assets/img/icons/ticket-icon-date.png' alt=''>
 						</div>
 						<div class='event_data-col event_data-text'>
@@ -483,7 +483,7 @@ function event_add_data_date_product_grid (){
 	$_year_evt 		= get_post_meta( get_the_ID(), '_year-evento', true );
 	
 	echo "<div class='product_grid_data'>
-		<span><i class='fa fa-calendar' aria-hidden='true'></i> " . $_month_evt . " " . $_num_evt . ", " . $_year_evt . "</span>
+		<span><i class='fas fa-calendar' aria-hidden='true'></i> " . $_month_evt . " " . $_num_evt . ", " . $_year_evt . "</span>
 	</div>";
 }
 add_action('woocommerce_after_shop_loop_item','event_add_data_date_product_grid');
