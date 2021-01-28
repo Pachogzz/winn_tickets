@@ -329,19 +329,16 @@ function botonRandom(){
 					//   });
 					  
 					var boletos = jQuery('.list-boletos input.boletoCheck:checked').map(function(_, el) {
-						return jQuery(el).val();
-					}).get().join(', ');
+						return '<span class="boleto-seleccionado">' + jQuery(el).val() + '</span>';
+					}).get().join('');
 					
-					jQuery('.boletosrandom').append('Boleto(s): ' + boletos);
+					jQuery('.boletosrandom').append('<div class="boletos-seleccion"><h6>Boleto(s) seleccionado(s): </h6> ' + boletos + '</div>');
 				}
 			})
 		});
 	</script>
-<?php
-}
+<?php }
 add_action( 'woocommerce_before_add_to_cart_button', 'botonRandom' );
-
-
 
 /**
  * Add custom cart item data
