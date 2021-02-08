@@ -251,9 +251,20 @@ function tabs_boletos() {
 			<?php foreach($prefijoTabs as $num => $tab): ?>
 				<div class="woocommerce-Tabs-panel woocommerce-Tabs-panel--<?php echo esc_attr( $num ); ?> panel entry-content wc-tab" id="tab-<?php echo esc_attr( $num ); ?>" role="tabpanel" aria-labelledby="tab-title-<?php echo esc_attr( $num ); ?>">
 					<ul class="list-boletos">
-						<?php for($n = 1; $n < $cantidadBoletos[$num] + 1; $n++) : ?>
+						<?php for($n = 0; $n < $cantidadBoletos[$num] + 0; $n++) : ?>
+
+								<?php 
+
+									if ($cantidadBoletos[$num] <= 99) {
+										$boleto = str_pad($n, 2, '0', STR_PAD_LEFT);
+									} else {
+										$boleto = str_pad($n, 3, '0', STR_PAD_LEFT);
+									}
+									
+								?>
+
 								<li <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "class='nodisponible'"; } ?>>
-									<label><input id="trigger" type="checkbox" class="boletoCheck" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $n; ?>" <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "disabled"; } ?> /><span><?php echo $prefijoBoletos[$num] . "-" . $n; ?></span></label>
+									<label><input id="trigger" type="checkbox" class="boletoCheck" name="boleto[]" value="<?php echo $prefijoBoletos[$num] . '-' . $boleto; ?>" <?php if(comprobarBoleto($prefijoBoletos[$num] . '-' . $n) === true){ echo "disabled"; } ?> /><span><?php echo $prefijoBoletos[$num] . "-" . $boleto; ?></span></label>
 								</li>
 						<?php endfor; ?>
 					</ul>
@@ -284,6 +295,15 @@ function tabs_boletos() {
 								jQuery(".single_add_to_cart_button").prop("disabled", true);
 							}
 						}
+
+						jQuery('.boletosrandom').empty()
+
+						var boletos = jQuery('.list-boletos input.boletoCheck:checked').map(function(_, el) {
+							return '<span class="boleto-seleccionado">' + jQuery(el).val() + '</span>';
+						}).get().join('');
+						
+						jQuery('.boletosrandom').append('<div class="boletos-seleccion"><h6>Boleto(s) seleccionado(s): </h6> ' + boletos + '</div>');
+
 					});
 
 				});
@@ -300,41 +320,38 @@ add_action( 'woocommerce_before_add_to_cart_button', 'tabs_boletos' );
 
 
 
-// Boton Random
+ // Boton Random
 function botonRandom(){
 ?>
 	<div class="boletosrandom alert-success"></div>
-	<a id="Random" style="margin-left:20px;">Random</a>
+	<!-- <a id="Random" style="margin-left:20px;">Random</a> -->
 	<script>
 		jQuery(function () {
-			jQuery("#Random").click(function() {
-				var maxAllowed = jQuery('input[name=quantity][type=number]').val();
+
+			// jQuery("#Random").click(function() {
+			// 	var maxAllowed = jQuery('input[name=quantity][type=number]').val();
 				
-				var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
-					return this;
-				});
+			// 	var checkboxes = jQuery(".list-boletos input.boletoCheck").map(function() {
+			// 		return this;
+			// 	});
 
-				jQuery(checkboxes).prop("checked", false);
-				jQuery(checkboxes).prop("disabled", true);
+			// 	jQuery(checkboxes).prop("checked", false);
+			// 	jQuery(checkboxes).prop("disabled", true);
 				
-				while(maxAllowed--) {
-					jQuery('.boletosrandom').empty()
+			// 	while(maxAllowed--) {
+			// 		jQuery('.boletosrandom').empty()
 
-					var rand = Math.floor(Math.random() * checkboxes.length);
-					var checkbox = checkboxes.splice(rand, 1)[0];
-					jQuery(checkbox).prop("checked", true);
+			// 		var rand = Math.floor(Math.random() * checkboxes.length);
+			// 		var checkbox = checkboxes.splice(rand, 1)[0];
+			// 		jQuery(checkbox).prop("checked", true);
 
-					// jQuery('.list-boletos input.boletoCheck:checked').each(function(){
-					// 	jQuery('.boletosrandom').append(jQuery(this).val());
-					//   });
-					  
-					var boletos = jQuery('.list-boletos input.boletoCheck:checked').map(function(_, el) {
-						return '<span class="boleto-seleccionado">' + jQuery(el).val() + '</span>';
-					}).get().join('');
+					// var boletos = jQuery('.list-boletos input.boletoCheck:checked').map(function(_, el) {
+					// 	return '<span class="boleto-seleccionado">' + jQuery(el).val() + '</span>';
+					// }).get().join('');
 					
-					jQuery('.boletosrandom').append('<div class="boletos-seleccion"><h6>Boleto(s) seleccionado(s): </h6> ' + boletos + '</div>');
-				}
-			})
+					// jQuery('.boletosrandom').append('<div class="boletos-seleccion"><h6>Boleto(s) seleccionado(s): </h6> ' + boletos + '</div>');
+			// 	}
+			// })
 		});
 	</script>
 <?php }
