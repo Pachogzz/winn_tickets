@@ -237,6 +237,30 @@ function winn_separate_registration_form() {
 }
 
 /**
+ * @snippet       Add First & Last Name to My Account Register Form - WooCommerce
+ * @how-to        woomedia.com
+ * @author        Antonio
+ * @compatible    WC 5.x
+ * @source        https://woodemia.com/cambiar-estado-del-pedido-en-woocommerce-automaticamente/
+ */
+
+// Actualiza automáticamente el estado de los pedidos a COMPLETADO
+add_action( 'woocommerce_order_status_processing', 'actualiza_estado_pedidos_a_completado' );
+add_action( 'woocommerce_order_status_on-hold', 'actualiza_estado_pedidos_a_completado' );
+function actualiza_estado_pedidos_a_completado( $order_id ) {
+    global $woocommerce;
+    
+    //ID's de las pasarelas de pago a las que afecta
+    $paymentMethods = array( 'stripe' );
+    
+    if ( !$order_id ) return;
+    $order = new WC_Order( $order_id );
+
+    if ( !in_array( $order->payment_method, $paymentMethods ) ) return;
+    $order->update_status( 'completed' );
+}
+
+/**
  * Redirect after logout
  */
 add_action('wp_logout','auto_redirect_after_logout');
